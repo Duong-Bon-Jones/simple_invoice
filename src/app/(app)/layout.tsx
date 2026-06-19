@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/upstream";
+import { getDisplayName } from "@/lib/session";
 import { LogoutButton } from "@/components/logout-button";
 
 function getInitials(name: string | null): string {
@@ -17,7 +17,7 @@ export default async function AppLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { name } = await getCurrentUser();
+  const name = await getDisplayName();
 
   return (
     <div className="flex min-h-screen flex-col">

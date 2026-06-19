@@ -21,25 +21,31 @@ const TokenResponseSchema = z.object({
   access_token: z.string().min(1),
   expires_in: z.number().int().positive(),
 });
-const MembershipResponseSchema = z.object({
+const MeResponseSchema = z.object({
   data: z.object({
+    firstName: z.string().min(1).optional(),
+    lastName: z.string().min(1).optional(),
     memberships: z.array(z.object({ token: z.string().min(1) })).min(1),
   }),
 });
-const CurrentUserResponseSchema = z.object({
-  data: z.object({
-    name: z.string().min(1).optional(),
-    fullName: z.string().min(1).optional(),
-    firstName: z.string().min(1).optional(),
-    lastName: z.string().min(1).optional(),
-    mobile: z.string().min(1).optional(),
-  }),
-});
+
+function displayNameFrom(data: {
+  firstName?: string;
+  lastName?: string;
+}): string | null {
+  const name = [data.firstName, data.lastName].filter(Boolean).join(" ");
+  return name || null;
+}
 
 export async function exchangeCredentialsForToken(
   username: string,
   password: string,
-): Promise<{ accessToken: string; orgToken: string; expiresIn: number }> {
+): Promise<{
+  accessToken: string;
+  orgToken: string;
+  expiresIn: number;
+  name: string | null;
+}> {
   const tokenResponse = await fetch(`${env.IDENTITY_BASE_URL}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -74,35 +80,14 @@ export async function exchangeCredentialsForToken(
     throw new Error(`Membership lookup failed: ${meResponse.status}`);
   }
 
-  const {
-    data: { memberships },
-  } = MembershipResponseSchema.parse(await meResponse.json());
+  const { data } = MeResponseSchema.parse(await meResponse.json());
 
-  return { accessToken, orgToken: memberships[0].token, expiresIn };
-}
-
-export async function getCurrentUser(): Promise<{ name: string | null }> {
-  try {
-    const response = await fetch(`${membershipServiceUrl}/users/me`, {
-      headers: await authHeaders(),
-    });
-    if (!response.ok) {
-      throw new Error(`Current user lookup failed: ${response.status}`);
-    }
-
-    const { data } = CurrentUserResponseSchema.parse(await response.json());
-    const name =
-      data.name ??
-      data.fullName ??
-      [data.firstName, data.lastName].filter(Boolean).join(" ") ??
-      data.mobile ??
-      null;
-
-    return { name: name || null };
-  } catch (error) {
-    console.error("Current user lookup failed", error);
-    return { name: null };
-  }
+  return {
+    accessToken,
+    orgToken: data.memberships[0].token,
+    expiresIn,
+    name: displayNameFrom(data),
+  };
 }
 
 export async function listInvoices(query: InvoiceQueryInput) {
