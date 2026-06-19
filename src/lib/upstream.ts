@@ -23,6 +23,15 @@ const MembershipResponseSchema = z.object({
     memberships: z.array(z.object({ token: z.string().min(1) })).min(1),
   }),
 });
+const CurrentUserResponseSchema = z.object({
+  data: z.object({
+    name: z.string().min(1).optional(),
+    fullName: z.string().min(1).optional(),
+    firstName: z.string().min(1).optional(),
+    lastName: z.string().min(1).optional(),
+    mobile: z.string().min(1).optional(),
+  }),
+});
 
 export async function exchangeCredentialsForToken(
   username: string,
@@ -68,6 +77,30 @@ export async function exchangeCredentialsForToken(
   } = MembershipResponseSchema.parse(await meResponse.json());
 
   return { accessToken, orgToken: memberships[0].token };
+}
+
+export async function getCurrentUser(): Promise<{ name: string | null }> {
+  try {
+    const response = await fetch(`${env.MEMBERSHIP_SERVICE_URL}/users/me`, {
+      headers: await authHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error(`Current user lookup failed: ${response.status}`);
+    }
+
+    const { data } = CurrentUserResponseSchema.parse(await response.json());
+    const name =
+      data.name ??
+      data.fullName ??
+      [data.firstName, data.lastName].filter(Boolean).join(" ") ??
+      data.mobile ??
+      null;
+
+    return { name: name || null };
+  } catch (error) {
+    console.error("Current user lookup failed", error);
+    return { name: null };
+  }
 }
 
 export async function listInvoices(query: InvoiceQueryInput) {
