@@ -1,6 +1,6 @@
 import "server-only";
 import { z } from "zod";
-import { env } from "@/lib/env";
+import { env, membershipServiceUrl, invoiceServiceUrl } from "@/lib/env";
 import { getAccessToken, getOrgToken } from "@/lib/session";
 import type { InvoiceCreateInput, InvoiceQueryInput } from "@/lib/schemas";
 
@@ -17,7 +17,10 @@ async function authHeaders(): Promise<HeadersInit> {
   };
 }
 
-const TokenResponseSchema = z.object({ access_token: z.string().min(1) });
+const TokenResponseSchema = z.object({
+  access_token: z.string().min(1),
+  expires_in: z.number().int().positive(),
+});
 const MembershipResponseSchema = z.object({
   data: z.object({
     memberships: z.array(z.object({ token: z.string().min(1) })).min(1),
@@ -36,7 +39,7 @@ const CurrentUserResponseSchema = z.object({
 export async function exchangeCredentialsForToken(
   username: string,
   password: string,
-): Promise<{ accessToken: string; orgToken: string }> {
+): Promise<{ accessToken: string; orgToken: string; expiresIn: number }> {
   const tokenResponse = await fetch(`${env.IDENTITY_BASE_URL}/oauth2/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -57,11 +60,10 @@ export async function exchangeCredentialsForToken(
     throw new Error(`Token exchange failed: ${tokenResponse.status}`);
   }
 
-  const { access_token: accessToken } = TokenResponseSchema.parse(
-    await tokenResponse.json(),
-  );
+  const { access_token: accessToken, expires_in: expiresIn } =
+    TokenResponseSchema.parse(await tokenResponse.json());
 
-  const meResponse = await fetch(`${env.MEMBERSHIP_SERVICE_URL}/users/me`, {
+  const meResponse = await fetch(`${membershipServiceUrl}/users/me`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
@@ -76,12 +78,12 @@ export async function exchangeCredentialsForToken(
     data: { memberships },
   } = MembershipResponseSchema.parse(await meResponse.json());
 
-  return { accessToken, orgToken: memberships[0].token };
+  return { accessToken, orgToken: memberships[0].token, expiresIn };
 }
 
 export async function getCurrentUser(): Promise<{ name: string | null }> {
   try {
-    const response = await fetch(`${env.MEMBERSHIP_SERVICE_URL}/users/me`, {
+    const response = await fetch(`${membershipServiceUrl}/users/me`, {
       headers: await authHeaders(),
     });
     if (!response.ok) {
@@ -104,20 +106,20 @@ export async function getCurrentUser(): Promise<{ name: string | null }> {
 }
 
 export async function listInvoices(query: InvoiceQueryInput) {
-  // TODO: GET `${env.INVOICE_SERVICE_URL}/invoices` with auth headers + query params.
+  // TODO: GET `${invoiceServiceUrl}/invoices` with auth headers + query params.
   void authHeaders;
   void query;
   throw new Error("not implemented");
 }
 
 export async function createInvoice(input: InvoiceCreateInput) {
-  // TODO: POST `${env.INVOICE_SERVICE_URL}/invoices` with auth headers + body.
+  // TODO: POST `${invoiceServiceUrl}/invoices` with auth headers + body.
   void input;
   throw new Error("not implemented");
 }
 
 export async function getInvoice(id: string) {
-  // TODO: GET `${env.INVOICE_SERVICE_URL}/invoices/${id}` with auth headers.
+  // TODO: GET `${invoiceServiceUrl}/invoices/${id}` with auth headers.
   void id;
   throw new Error("not implemented");
 }

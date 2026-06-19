@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 const ACCESS_TOKEN_COOKIE = "access_token";
 const ORG_TOKEN_COOKIE = "org_token";
 
-const COOKIE_OPTIONS = {
+const BASE_COOKIE_OPTIONS = {
   httpOnly: true,
   secure: true,
   sameSite: "lax" as const,
@@ -14,10 +14,12 @@ const COOKIE_OPTIONS = {
 export async function setSession(tokens: {
   accessToken: string;
   orgToken: string;
+  expiresIn: number;
 }) {
   const cookieStore = await cookies();
-  cookieStore.set(ACCESS_TOKEN_COOKIE, tokens.accessToken, COOKIE_OPTIONS);
-  cookieStore.set(ORG_TOKEN_COOKIE, tokens.orgToken, COOKIE_OPTIONS);
+  const options = { ...BASE_COOKIE_OPTIONS, maxAge: tokens.expiresIn };
+  cookieStore.set(ACCESS_TOKEN_COOKIE, tokens.accessToken, options);
+  cookieStore.set(ORG_TOKEN_COOKIE, tokens.orgToken, options);
 }
 
 export async function getAccessToken(): Promise<string | undefined> {
