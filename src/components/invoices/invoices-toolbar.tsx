@@ -1,0 +1,122 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useInvoiceParams } from "./use-invoice-params";
+
+const STATUS_OPTIONS = ["Draft", "Sent", "Paid", "Overdue", "Cancelled"];
+
+const SORT_OPTIONS = [
+  { value: "CREATED_DATE:DESCENDING", label: "Newest first" },
+  { value: "CREATED_DATE:ASCENDING", label: "Oldest first" },
+  { value: "DUE_DATE:ASCENDING", label: "Due soonest" },
+  { value: "DUE_DATE:DESCENDING", label: "Due latest" },
+  { value: "TOTAL_AMOUNT:DESCENDING", label: "Amount: high to low" },
+  { value: "TOTAL_AMOUNT:ASCENDING", label: "Amount: low to high" },
+];
+
+const SEARCH_DEBOUNCE_MS = 350;
+
+export function InvoicesToolbar() {
+  const { searchParams, setFilter } = useInvoiceParams();
+  const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
+
+  useEffect(() => {
+    const current = searchParams.get("keyword") ?? "";
+    if (keyword === current) return;
+    const id = setTimeout(() => {
+      setFilter({ keyword: keyword || undefined });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(id);
+  }, [keyword, searchParams, setFilter]);
+
+  const status = searchParams.get("status") ?? "all";
+  const sortBy = searchParams.get("sortBy") ?? "CREATED_DATE";
+  const ordering = searchParams.get("ordering") ?? "DESCENDING";
+  const sortValue = `${sortBy}:${ordering}`;
+  const fromDate = searchParams.get("fromDate") ?? "";
+  const toDate = searchParams.get("toDate") ?? "";
+
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="relative flex-1 sm:max-w-xs">
+        <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search invoice number..."
+          aria-label="Search invoices"
+          className="pl-8 font-mono"
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
+        />
+      </div>
+
+      <Select
+        value={status}
+        onValueChange={(value) =>
+          setFilter({ status: value === "all" ? undefined : value })
+        }
+      >
+        <SelectTrigger className="w-[150px]" aria-label="Filter by status">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All statuses</SelectItem>
+          {STATUS_OPTIONS.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={sortValue}
+        onValueChange={(value) => {
+          const [nextSortBy, nextOrdering] = value.split(":");
+          setFilter({ sortBy: nextSortBy, ordering: nextOrdering });
+        }}
+      >
+        <SelectTrigger className="w-[190px]" aria-label="Sort invoices">
+          <SelectValue placeholder="Sort" />
+        </SelectTrigger>
+        <SelectContent>
+          {SORT_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <div className="flex items-center gap-2">
+        <Input
+          type="date"
+          aria-label="From date"
+          className="w-[150px]"
+          value={fromDate}
+          onChange={(event) =>
+            setFilter({ fromDate: event.target.value || undefined })
+          }
+        />
+        <span className="text-sm text-muted-foreground">to</span>
+        <Input
+          type="date"
+          aria-label="To date"
+          className="w-[150px]"
+          value={toDate}
+          onChange={(event) =>
+            setFilter({ toDate: event.target.value || undefined })
+          }
+        />
+      </div>
+    </div>
+  );
+}

@@ -11,9 +11,14 @@ export async function GET(request: Request) {
 
   const searchParams = new URL(request.url).searchParams;
   const parsed = InvoiceQuerySchema.safeParse({
-    search: searchParams.get("search") ?? undefined,
-    page: searchParams.get("page") ?? undefined,
-    limit: searchParams.get("limit") ?? undefined,
+    keyword: searchParams.get("keyword") ?? undefined,
+    status: searchParams.get("status") ?? undefined,
+    fromDate: searchParams.get("fromDate") ?? undefined,
+    toDate: searchParams.get("toDate") ?? undefined,
+    sortBy: searchParams.get("sortBy") ?? undefined,
+    ordering: searchParams.get("ordering") ?? undefined,
+    pageNum: searchParams.get("pageNum") ?? undefined,
+    pageSize: searchParams.get("pageSize") ?? undefined,
   });
 
   if (!parsed.success) {
