@@ -10,6 +10,10 @@ import {
 import { InvoiceStatusBadge } from "./invoice-status-badge";
 import type { Invoice } from "@/lib/schemas";
 
+function activeStatusLabel(status: Invoice["status"]): string | undefined {
+  return status?.find((s) => s.value)?.key;
+}
+
 function formatAmount(amount: number | undefined, currency: string | undefined): string {
   if (amount === undefined) return "—";
   return new Intl.NumberFormat("en-US", {
@@ -57,15 +61,15 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
                 invoice.invoiceNumber ?? "—"
               )}
             </TableCell>
-            <TableCell>{invoice.customerName ?? "—"}</TableCell>
+            <TableCell>{invoice.customer?.name ?? "—"}</TableCell>
             <TableCell className="text-right font-mono">
               {formatAmount(invoice.totalAmount, invoice.currency)}
             </TableCell>
             <TableCell>
-              <InvoiceStatusBadge status={invoice.status} />
+              <InvoiceStatusBadge status={activeStatusLabel(invoice.status)} />
             </TableCell>
             <TableCell>{formatDate(invoice.dueDate)}</TableCell>
-            <TableCell>{formatDate(invoice.createdDate)}</TableCell>
+            <TableCell>{formatDate(invoice.createdAt)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -2,6 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { env, membershipServiceUrl, invoiceServiceUrl } from "@/lib/env";
 import { getAccessToken, getOrgToken } from "@/lib/session";
+import { InvoiceListSchema } from "@/lib/schemas";
 import type { InvoiceCreateInput, InvoiceQueryInput } from "@/lib/schemas";
 
 export class AuthError extends Error {}
@@ -13,7 +14,7 @@ async function authHeaders(): Promise<HeadersInit> {
   ]);
   return {
     Authorization: `Bearer ${accessToken}`,
-    "X-Org-Token": orgToken ?? "",
+    "org-token": orgToken ?? "",
   };
 }
 
@@ -91,10 +92,33 @@ export async function exchangeCredentialsForToken(
 }
 
 export async function listInvoices(query: InvoiceQueryInput) {
-  // TODO: GET `${invoiceServiceUrl}/invoices` with auth headers + query params.
-  void authHeaders;
-  void query;
-  throw new Error("not implemented");
+  const params = new URLSearchParams({
+    sortBy: query.sortBy,
+    ordering: query.ordering,
+    pageNum: String(query.pageNum),
+    pageSize: String(query.pageSize),
+  });
+  for (const key of ["keyword", "status", "fromDate", "toDate"] as const) {
+    if (query[key]) params.set(key, query[key]!);
+  }
+
+  const res = await fetch(`${invoiceServiceUrl}/invoices?${params}`, {
+    headers: { ...(await authHeaders()), Accept: "application/json" },
+    cache: "no-store",
+  });
+  if (res.status === 401) throw new AuthError("Session expired");
+  if (!res.ok) throw new Error(`List invoices failed: ${res.status}`);
+
+  const parsed = InvoiceListSchema.parse(await res.json());
+  const invoices = parsed.data;
+  return {
+    invoices,
+    paging: {
+      pageNum: parsed.paging?.pageNumber ?? query.pageNum,
+      pageSize: parsed.paging?.pageSize ?? query.pageSize,
+      total: parsed.paging?.totalRecords ?? invoices.length,
+    },
+  };
 }
 
 export async function createInvoice(input: InvoiceCreateInput) {

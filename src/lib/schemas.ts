@@ -31,29 +31,30 @@ const InvoiceSchema = z
   .object({
     invoiceId: z.string().optional(),
     invoiceNumber: z.string().optional(),
-    customerName: z.string().optional(),
     totalAmount: z.coerce.number().optional(),
     currency: z.string().optional(),
-    status: z.string().optional(),
     dueDate: z.string().optional(),
-    createdDate: z.string().optional(),
+    createdAt: z.string().optional(),
+    customer: z
+      .object({ id: z.string().optional(), name: z.string().optional() })
+      .partial()
+      .optional(),
+    status: z.array(z.object({ key: z.string(), value: z.boolean() })).optional(),
   })
   .passthrough();
 export type Invoice = z.infer<typeof InvoiceSchema>;
 
 export const InvoiceListSchema = z
   .object({
-    data: z.object({
-      invoices: z.array(InvoiceSchema).default([]),
-      paging: z
-        .object({
-          pageNum: z.coerce.number(),
-          pageSize: z.coerce.number(),
-          total: z.coerce.number(),
-        })
-        .partial()
-        .optional(),
-    }),
+    data: z.array(InvoiceSchema).default([]),
+    paging: z
+      .object({
+        pageNumber: z.coerce.number(),
+        pageSize: z.coerce.number(),
+        totalRecords: z.coerce.number(),
+      })
+      .partial()
+      .optional(),
   })
   .passthrough();
 export type InvoiceListResponse = z.infer<typeof InvoiceListSchema>;
