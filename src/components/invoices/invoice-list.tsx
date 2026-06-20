@@ -1,6 +1,7 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { listInvoices } from "@/lib/upstream";
+import { AuthError, listInvoices } from "@/lib/upstream";
 import type { InvoiceQueryInput } from "@/lib/schemas";
+import { SessionExpiredDialog } from "@/components/session-expired-dialog";
 import { InvoiceTable } from "./invoice-table";
 import { InvoicePagination } from "./invoice-pagination";
 
@@ -9,6 +10,8 @@ export async function InvoiceList({ query }: { query: InvoiceQueryInput }) {
   try {
     result = await listInvoices(query);
   } catch (error) {
+    if (error instanceof AuthError) return <SessionExpiredDialog />;
+
     console.error("Failed to load invoices", error);
     return (
       <Alert variant="destructive">

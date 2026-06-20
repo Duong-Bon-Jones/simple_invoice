@@ -7,6 +7,10 @@ import type { InvoiceCreateInput, InvoiceQueryInput } from "@/lib/schemas";
 
 export class AuthError extends Error {}
 
+function throwIfUnauthorized(res: Response) {
+  if (res.status === 401) throw new AuthError("Session expired");
+}
+
 async function authHeaders(): Promise<HeadersInit> {
   const [accessToken, orgToken] = await Promise.all([
     getAccessToken(),
@@ -106,7 +110,7 @@ export async function listInvoices(query: InvoiceQueryInput) {
     headers: { ...(await authHeaders()), Accept: "application/json" },
     cache: "no-store",
   });
-  if (res.status === 401) throw new AuthError("Session expired");
+  throwIfUnauthorized(res);
   if (!res.ok) throw new Error(`List invoices failed: ${res.status}`);
 
   const parsed = InvoiceListSchema.parse(await res.json());
