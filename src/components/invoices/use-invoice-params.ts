@@ -30,5 +30,9 @@ export function useInvoiceParams() {
     [router, pathname, searchParams],
   );
 
-  return { searchParams, setFilter, setPage };
+  const clearFilters = useCallback(() => {
+    router.replace(pathname);
+  }, [router, pathname]);
+
+  return { searchParams, setFilter, setPage, clearFilters };
 }

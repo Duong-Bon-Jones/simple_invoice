@@ -1,8 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { format, parse } from "date-fns";
+import { CalendarIcon, Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -12,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useInvoiceParams } from "./use-invoice-params";
 
-const STATUS_OPTIONS = ["Draft", "Sent", "Paid", "Overdue", "Cancelled"];
+const STATUS_OPTIONS = ["Due", "Paid", "Overdue", "Cancelled"];
 
 const SORT_OPTIONS = [
   { value: "CREATED_DATE:DESCENDING", label: "Newest first" },
@@ -24,9 +32,58 @@ const SORT_OPTIONS = [
 ];
 
 const SEARCH_DEBOUNCE_MS = 350;
+const DATE_FORMAT = "yyyy-MM-dd";
+
+function parseDate(value: string) {
+  return value ? parse(value, DATE_FORMAT, new Date()) : undefined;
+}
+
+function DateField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string | undefined) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = parseDate(value);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          aria-label={label}
+          className="w-37.5 justify-start font-normal"
+        >
+          <CalendarIcon className="size-4" />
+          {selected ? (
+            format(selected, "MMM d, yyyy")
+          ) : (
+            <span className="text-muted-foreground">{label}</span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="single"
+          captionLayout="dropdown"
+          selected={selected}
+          onSelect={(date) => {
+            onChange(date ? format(date, DATE_FORMAT) : undefined);
+            setOpen(false);
+          }}
+        />
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 export function InvoicesToolbar() {
-  const { searchParams, setFilter } = useInvoiceParams();
+  const { searchParams, setFilter, clearFilters } = useInvoiceParams();
   const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
 
   useEffect(() => {
@@ -44,6 +101,20 @@ export function InvoicesToolbar() {
   const sortValue = `${sortBy}:${ordering}`;
   const fromDate = searchParams.get("fromDate") ?? "";
   const toDate = searchParams.get("toDate") ?? "";
+  const pageSize = searchParams.get("pageSize") ?? "10";
+
+  const hasFilters =
+    keyword ||
+    status !== "all" ||
+    fromDate ||
+    toDate ||
+    sortValue !== "CREATED_DATE:DESCENDING" ||
+    pageSize !== "10";
+
+  function handleClear() {
+    setKeyword("");
+    clearFilters();
+  }
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -64,7 +135,7 @@ export function InvoicesToolbar() {
           setFilter({ status: value === "all" ? undefined : value })
         }
       >
-        <SelectTrigger className="w-[150px]" aria-label="Filter by status">
+        <SelectTrigger className="w-37.5" aria-label="Filter by status">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
@@ -84,7 +155,7 @@ export function InvoicesToolbar() {
           setFilter({ sortBy: nextSortBy, ordering: nextOrdering });
         }}
       >
-        <SelectTrigger className="w-[190px]" aria-label="Sort invoices">
+        <SelectTrigger className="w-47.5" aria-label="Sort invoices">
           <SelectValue placeholder="Sort" />
         </SelectTrigger>
         <SelectContent>
@@ -97,26 +168,29 @@ export function InvoicesToolbar() {
       </Select>
 
       <div className="flex items-center gap-2">
-        <Input
-          type="date"
-          aria-label="From date"
-          className="w-[150px]"
+        <DateField
+          label="From date"
           value={fromDate}
-          onChange={(event) =>
-            setFilter({ fromDate: event.target.value || undefined })
-          }
+          onChange={(value) => setFilter({ fromDate: value })}
         />
         <span className="text-sm text-muted-foreground">to</span>
-        <Input
-          type="date"
-          aria-label="To date"
-          className="w-[150px]"
+        <DateField
+          label="To date"
           value={toDate}
-          onChange={(event) =>
-            setFilter({ toDate: event.target.value || undefined })
-          }
+          onChange={(value) => setFilter({ toDate: value })}
         />
       </div>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        disabled={!hasFilters}
+        onClick={handleClear}
+      >
+        <X className="size-4" />
+        Clear filters
+      </Button>
     </div>
   );
 }
