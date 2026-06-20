@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  experimental: {
+    sri: {
+      algorithm: "sha256",
+    },
+  },
   async headers() {
     return [
       {
