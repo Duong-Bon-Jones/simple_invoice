@@ -3,9 +3,13 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LinkStatusIcon } from "@/components/ui/link-status-icon";
 import { PAGE_SIZE_COOKIE } from "@/components/invoices/page-size-cookie";
+import { InvoiceFilterTransitionProvider } from "@/components/invoices/invoice-filter-transition";
+import { InvoiceTableArea } from "@/components/invoices/invoice-table-area";
 import { InvoicesToolbar } from "@/components/invoices/invoices-toolbar";
 import { InvoiceList } from "@/components/invoices/invoice-list";
+import { InvoicePagination } from "@/components/invoices/invoice-pagination";
 import { InvoiceTableSkeleton } from "@/components/invoices/invoice-table-skeleton";
 import { InvoiceQuerySchema, PageSizeSchema } from "@/lib/schemas";
 
@@ -31,17 +35,29 @@ export default async function InvoicesPage({
         <h1 className="text-2xl font-semibold tracking-tight">Invoices</h1>
         <Button asChild>
           <Link href="/invoices/new">
-            <Plus className="size-4" />
+            <LinkStatusIcon icon={<Plus className="size-4" />} />
             New invoice
           </Link>
         </Button>
       </div>
 
-      <InvoicesToolbar />
+      <InvoiceFilterTransitionProvider
+        initialPagingInfo={{
+          pageNum: query.pageNum,
+          pageSize: query.pageSize,
+          total: 0,
+        }}
+      >
+        <InvoicesToolbar />
 
-      <Suspense key={JSON.stringify(query)} fallback={<InvoiceTableSkeleton />}>
-        <InvoiceList query={query} />
-      </Suspense>
+        <InvoiceTableArea>
+          <Suspense key={JSON.stringify(query)} fallback={<InvoiceTableSkeleton />}>
+            <InvoiceList query={query} />
+          </Suspense>
+        </InvoiceTableArea>
+
+        <InvoicePagination />
+      </InvoiceFilterTransitionProvider>
     </div>
   );
 }

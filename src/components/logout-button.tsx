@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
 export function LogoutButton() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [open, setOpen] = useState(false);
 
   function handleLogout() {
     startTransition(async () => {
@@ -29,7 +30,13 @@ export function LogoutButton() {
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog
+      open={open}
+      onOpenChange={(next) => {
+        if (isPending) return;
+        setOpen(next);
+      }}
+    >
       <AlertDialogTrigger asChild>
         <Button type="button" variant="ghost" size="sm">
           <LogOut className="size-3.5" />

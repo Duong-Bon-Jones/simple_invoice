@@ -3,7 +3,7 @@ import { AuthError, listInvoices } from "@/lib/upstream";
 import type { InvoiceQueryInput } from "@/lib/schemas";
 import { SessionExpiredDialog } from "@/components/session-expired-dialog";
 import { InvoiceTable } from "./invoice-table";
-import { InvoicePagination } from "./invoice-pagination";
+import { InvoicePagingSync } from "./invoice-paging-sync";
 
 export async function InvoiceList({ query }: { query: InvoiceQueryInput }) {
   let result;
@@ -29,6 +29,11 @@ export async function InvoiceList({ query }: { query: InvoiceQueryInput }) {
         <p className="text-sm text-muted-foreground">
           Try adjusting your search or filters.
         </p>
+        <InvoicePagingSync
+          pageNum={result.paging.pageNum}
+          pageSize={result.paging.pageSize}
+          total={result.paging.total}
+        />
       </div>
     );
   }
@@ -36,7 +41,7 @@ export async function InvoiceList({ query }: { query: InvoiceQueryInput }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <InvoiceTable invoices={result.invoices} />
-      <InvoicePagination
+      <InvoicePagingSync
         pageNum={result.paging.pageNum}
         pageSize={result.paging.pageSize}
         total={result.paging.total}

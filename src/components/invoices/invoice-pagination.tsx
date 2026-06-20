@@ -1,8 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -13,28 +12,25 @@ import {
 } from "@/components/ui/select";
 import { useCookieState } from "@/hooks/use-cookie-state";
 import { PAGE_SIZE_COOKIE } from "./page-size-cookie";
+import { useInvoiceFilterTransition } from "./invoice-filter-transition";
 import { useInvoiceParams } from "./use-invoice-params";
 
 const PAGE_SIZE_OPTIONS = ["10", "20", "50", "100"];
 
-type Props = {
-  pageNum: number;
-  pageSize: number;
-  total: number;
-};
-
-export function InvoicePagination({ pageNum, pageSize, total }: Props) {
+export function InvoicePagination() {
   const router = useRouter();
   const { setPage } = useInvoiceParams();
+  const { isPending, startNavigation, pagingInfo } =
+    useInvoiceFilterTransition();
+  const { pageNum, pageSize, total } = pagingInfo;
   const [, setPageSizeCookie] = useCookieState(
     PAGE_SIZE_COOKIE,
     String(pageSize),
   );
-  const [isPending, startTransition] = useTransition();
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   function goTo(page: number) {
-    startTransition(() => setPage(page));
+    startNavigation(() => setPage(page));
   }
 
   return (
@@ -44,7 +40,7 @@ export function InvoicePagination({ pageNum, pageSize, total }: Props) {
           value={String(pageSize)}
           onValueChange={(value) => {
             setPageSizeCookie(value);
-            startTransition(() => {
+            startNavigation(() => {
               setPage(1);
               router.refresh();
             });
@@ -67,9 +63,6 @@ export function InvoicePagination({ pageNum, pageSize, total }: Props) {
         </span>
       </div>
       <div className="flex items-center gap-2">
-        {isPending && (
-          <Loader2 className="size-4 animate-spin text-muted-foreground motion-reduce:animate-none" />
-        )}
         <Button
           type="button"
           variant="outline"
