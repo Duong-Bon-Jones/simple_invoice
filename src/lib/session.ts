@@ -23,7 +23,9 @@ export async function setSession(tokens: {
   cookieStore.set(ACCESS_TOKEN_COOKIE, tokens.accessToken, options);
   cookieStore.set(ORG_TOKEN_COOKIE, tokens.orgToken, options);
   if (tokens.name) {
-    cookieStore.set(DISPLAY_NAME_COOKIE, tokens.name, options);
+    // Not httpOnly: the display name isn't a secret, and the client needs to
+    // read it directly to render the (app) layout statically.
+    cookieStore.set(DISPLAY_NAME_COOKIE, tokens.name, { ...options, httpOnly: false });
   }
 }
 
@@ -35,11 +37,6 @@ export async function getAccessToken(): Promise<string | undefined> {
 export async function getOrgToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
   return cookieStore.get(ORG_TOKEN_COOKIE)?.value;
-}
-
-export async function getDisplayName(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get(DISPLAY_NAME_COOKIE)?.value ?? null;
 }
 
 export async function hasSession(): Promise<boolean> {
