@@ -1,4 +1,21 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { InvoiceForm } from "@/components/invoices/invoice-form";
+
 export default function NewInvoicePage() {
-  // TODO: create invoice form, posts to /api/invoices
-  return <h1>New Invoice</h1>;
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center gap-3">
+        <Link
+          href="/invoices"
+          className="text-muted-foreground hover:text-foreground"
+          aria-label="Back to invoices"
+        >
+          <ArrowLeft className="size-4" />
+        </Link>
+        <h1 className="text-2xl font-semibold tracking-tight">New invoice</h1>
+      </div>
+      <InvoiceForm />
+    </div>
+  );
 }
