@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { useLocalStorage } from "@/hooks/use-local-storage";
@@ -76,51 +76,30 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
     parseFiltersFromSearch(typeof window === "undefined" ? "" : window.location.search),
   );
 
-  const syncUrl = useCallback(
-    (next: Filters) => {
-      window.history.replaceState(null, "", `${pathname}${buildSearch(next)}`);
-    },
-    [pathname],
-  );
+  // Mirror filters to the URL (no router roundtrip) whenever they change.
+  useEffect(() => {
+    window.history.replaceState(null, "", `${pathname}${buildSearch(filters)}`);
+  }, [pathname, filters]);
 
-  const setFilter = useCallback(
-    (updates: Partial<Omit<Filters, "pageNum">>) => {
-      setFilters((prev) => {
-        const next = { ...prev, ...updates, pageNum: 1 };
-        syncUrl(next);
-        return next;
-      });
-    },
-    [syncUrl],
-  );
+  const setFilter = useCallback((updates: Partial<Omit<Filters, "pageNum">>) => {
+    setFilters((prev) => ({ ...prev, ...updates, pageNum: 1 }));
+  }, []);
 
-  const setPage = useCallback(
-    (pageNum: number) => {
-      setFilters((prev) => {
-        const next = { ...prev, pageNum };
-        syncUrl(next);
-        return next;
-      });
-    },
-    [syncUrl],
-  );
+  const setPage = useCallback((pageNum: number) => {
+    setFilters((prev) => ({ ...prev, pageNum }));
+  }, []);
 
   const setPageSize = useCallback(
     (size: number) => {
       setPageSizeRaw(String(size));
-      setFilters((prev) => {
-        const next = { ...prev, pageNum: 1 };
-        syncUrl(next);
-        return next;
-      });
+      setFilters((prev) => ({ ...prev, pageNum: 1 }));
     },
-    [setPageSizeRaw, syncUrl],
+    [setPageSizeRaw],
   );
 
   const clearFilters = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
-    syncUrl(DEFAULT_FILTERS);
-  }, [syncUrl]);
+  }, []);
 
   const query = useMemo<InvoiceQueryInput>(
     () => ({ ...filters, pageSize }),
