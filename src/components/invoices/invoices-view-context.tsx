@@ -34,8 +34,10 @@ function buildSearch(filters: Filters): string {
   if (filters.status) params.set("status", filters.status);
   if (filters.fromDate) params.set("fromDate", filters.fromDate);
   if (filters.toDate) params.set("toDate", filters.toDate);
-  if (filters.sortBy !== DEFAULT_FILTERS.sortBy) params.set("sortBy", filters.sortBy);
-  if (filters.ordering !== DEFAULT_FILTERS.ordering) params.set("ordering", filters.ordering);
+  if (filters.sortBy !== DEFAULT_FILTERS.sortBy)
+    params.set("sortBy", filters.sortBy);
+  if (filters.ordering !== DEFAULT_FILTERS.ordering)
+    params.set("ordering", filters.ordering);
   if (filters.pageNum !== DEFAULT_FILTERS.pageNum) {
     params.set("pageNum", String(filters.pageNum));
   }
@@ -64,7 +66,9 @@ const InvoicesViewContext = createContext<InvoicesViewState | null>(null);
 export function useInvoicesView(): InvoicesViewState {
   const context = useContext(InvoicesViewContext);
   if (!context) {
-    throw new Error("useInvoicesView must be used within an InvoicesViewProvider");
+    throw new Error(
+      "useInvoicesView must be used within an InvoicesViewProvider",
+    );
   }
   return context;
 }
@@ -73,7 +77,10 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [pageSizeRaw, setPageSizeRaw] = useLocalStorage(PAGE_SIZE_STORAGE_KEY, "10");
+  const [pageSizeRaw, setPageSizeRaw] = useLocalStorage(
+    PAGE_SIZE_STORAGE_KEY,
+    "10",
+  );
   const pageSize = Number(pageSizeRaw);
 
   // URL is the single source of truth for filters/page — no mirrored React state.
@@ -84,6 +91,11 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
 
   const navigate = useCallback(
     (next: Filters) => {
+      // Next.js bug: on a statically prerendered route, replace()'s
+      // canonicalUrl goes stale and the address bar/useSearchParams never
+      // update. Calling refresh() first is the workaround.
+      // https://github.com/vercel/next.js/issues/92152
+      router.refresh();
       router.replace(`${pathname}${buildSearch(next)}`, { scroll: false });
     },
     [pathname, router],
@@ -145,6 +157,8 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <InvoicesViewContext.Provider value={value}>{children}</InvoicesViewContext.Provider>
+    <InvoicesViewContext.Provider value={value}>
+      {children}
+    </InvoicesViewContext.Provider>
   );
 }
