@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { SessionExpiredError } from "@/lib/client-errors";
 import type { Invoice, InvoiceQueryInput } from "@/lib/schemas";
 
@@ -34,6 +34,7 @@ export function useInvoices(query: InvoiceQueryInput) {
   return useQuery({
     queryKey: ["invoices", query],
     queryFn: () => fetchInvoices(query),
+    placeholderData: keepPreviousData,
     retry: (failureCount, error) =>
       error instanceof SessionExpiredError ? false : failureCount < 3,
   });

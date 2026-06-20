@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Search, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { RefreshCw, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DateField } from "@/components/ui/date-field";
 import { Input } from "@/components/ui/input";
@@ -28,10 +28,15 @@ const SORT_OPTIONS = [
 const SEARCH_DEBOUNCE_MS = 350;
 
 export function InvoicesToolbar() {
-  const { filters, setFilter, clearFilters } = useInvoicesView();
+  const { filters, setFilter, clearFilters, refetch, isFetching } = useInvoicesView();
   const [keyword, setKeyword] = useState(filters.keyword ?? "");
+  const skipNextDebounce = useRef(false);
 
   useEffect(() => {
+    if (skipNextDebounce.current) {
+      skipNextDebounce.current = false;
+      return;
+    }
     const current = filters.keyword ?? "";
     if (keyword === current) return;
     const id = setTimeout(() => {
@@ -46,14 +51,10 @@ export function InvoicesToolbar() {
   const fromDate = filters.fromDate ?? "";
   const toDate = filters.toDate ?? "";
 
-  const hasFilters =
-    keyword ||
-    status !== "all" ||
-    fromDate ||
-    toDate ||
-    sortValue !== "CREATED_DATE:DESCENDING";
+  const hasFilters = keyword || status !== "all" || fromDate || toDate;
 
   function handleClear() {
+    skipNextDebounce.current = true;
     setKeyword("");
     clearFilters();
   }
@@ -135,6 +136,18 @@ export function InvoicesToolbar() {
       >
         <X className="size-4" />
         Clear filters
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        disabled={isFetching}
+        onClick={() => refetch()}
+        aria-label="Refresh invoices"
+      >
+        <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />
+        Refresh
       </Button>
     </div>
   );

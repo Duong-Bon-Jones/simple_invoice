@@ -10,7 +10,7 @@ import { InvoiceTableSkeleton } from "./invoice-table-skeleton";
 import { InvoicePagination } from "./invoice-pagination";
 
 function InvoicesContent() {
-  const { invoices, error } = useInvoicesView();
+  const { invoices, error, isFetching } = useInvoicesView();
 
   if (error instanceof SessionExpiredError) return <SessionExpiredDialog />;
 
@@ -24,7 +24,7 @@ function InvoicesContent() {
     );
   }
 
-  if (!invoices) return <InvoiceTableSkeleton />;
+  if (!invoices || isFetching) return <InvoiceTableSkeleton />;
 
   if (invoices.length === 0) {
     return (

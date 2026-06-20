@@ -56,6 +56,7 @@ type InvoicesViewState = {
   setPage: (pageNum: number) => void;
   setPageSize: (size: number) => void;
   clearFilters: () => void;
+  refetch: () => void;
 };
 
 const InvoicesViewContext = createContext<InvoicesViewState | null>(null);
@@ -111,14 +112,18 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
   );
 
   const clearFilters = useCallback(() => {
-    navigate(DEFAULT_FILTERS);
-  }, [navigate]);
+    navigate({
+      ...DEFAULT_FILTERS,
+      sortBy: filters.sortBy,
+      ordering: filters.ordering,
+    });
+  }, [navigate, filters.sortBy, filters.ordering]);
 
   const query = useMemo<InvoiceQueryInput>(
     () => ({ ...filters, pageSize }),
     [filters, pageSize],
   );
-  const { data, isFetching, error } = useInvoices(query);
+  const { data, isFetching, error, refetch } = useInvoices(query);
   const paging: Paging = data?.paging ?? {
     pageNum: filters.pageNum,
     pageSize,
@@ -136,6 +141,7 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
     setPage,
     setPageSize,
     clearFilters,
+    refetch: () => void refetch(),
   };
 
   return (
