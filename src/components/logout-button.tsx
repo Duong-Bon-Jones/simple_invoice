@@ -21,7 +21,11 @@ export function LogoutButton() {
   const [isPending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
 
-  function handleLogout() {
+  function handleLogout(event: React.MouseEvent) {
+    // AlertDialogAction auto-closes on click (Radix's internal Close wrapper);
+    // preventDefault stops that so the dialog stays open through the pending
+    // logout request instead of closing right away.
+    event.preventDefault();
     startTransition(async () => {
       await fetch("/api/auth/logout", { method: "POST" });
       router.push("/login");

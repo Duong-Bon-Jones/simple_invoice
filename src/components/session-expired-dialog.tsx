@@ -17,7 +17,10 @@ export function SessionExpiredDialog() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  function handleLogin() {
+  function handleLogin(event: React.MouseEvent) {
+    // AlertDialogAction auto-closes on click; preventDefault keeps the
+    // dialog (and its pending spinner) visible through the request.
+    event.preventDefault();
     startTransition(async () => {
       await fetch("/api/auth/logout", { method: "POST" });
       router.push("/login");
