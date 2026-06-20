@@ -6,11 +6,38 @@ export const LoginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof LoginSchema>;
 
-export const InvoiceCreateSchema = z.object({
-  customerName: z.string().min(1),
-  amount: z.number().positive(),
-  dueDate: z.string().min(1),
-});
+export const InvoiceCreateSchema = z
+  .object({
+    customerFirstName: z.string().min(1, "Required"),
+    customerLastName: z.string().min(1, "Required"),
+    email: z.email("Enter a valid email"),
+    mobileNumber: z
+      .string()
+      .regex(/^\+?[0-9]{7,15}$/, "Enter a valid mobile number"),
+    accountName: z.string().min(1, "Required"),
+    accountNumber: z
+      .string()
+      .regex(/^\d{6,12}$/, "Enter a valid account number"),
+    sortCode: z.string().regex(/^\d{2}-\d{2}-\d{2}$/, "Use format 00-00-00"),
+    currency: z.enum(["GBP", "USD", "EUR", "SGD", "VND"]),
+    invoiceDate: z.string().min(1, "Required"),
+    dueDate: z.string().min(1, "Required"),
+    description: z.string(),
+    itemName: z.string().min(1, "Required"),
+    itemDescription: z.string().min(1, "Required"),
+    quantity: z.number().positive("Must be greater than 0"),
+    rate: z.number().positive("Must be greater than 0"),
+    itemUOM: z.string().min(1, "Required"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.dueDate < data.invoiceDate) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["dueDate"],
+        message: "Due date can't be before the invoice date",
+      });
+    }
+  });
 export type InvoiceCreateInput = z.infer<typeof InvoiceCreateSchema>;
 
 export const InvoiceQuerySchema = z.object({

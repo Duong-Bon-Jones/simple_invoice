@@ -14,6 +14,9 @@ export async function withSessionGuard<T>(
     if (error instanceof AuthError) {
       return { ok: false, error: "Session expired", sessionExpired: true };
     }
-    return { ok: false, error: "Something went wrong" };
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Something went wrong",
+    };
   }
 }

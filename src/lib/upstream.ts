@@ -11,6 +11,15 @@ function throwIfUnauthorized(res: Response) {
   if (res.status === 401) throw new AuthError("Session expired");
 }
 
+async function describeUpstreamError(res: Response): Promise<string> {
+  const body = (await res.json().catch(() => null)) as {
+    errors?: Array<{ message?: string }>;
+  } | null;
+  const upstreamMessage = body?.errors?.[0]?.message?.trim();
+  const status = `${res.status} ${res.statusText}`.trim();
+  return upstreamMessage ? `${status}: ${upstreamMessage}` : status;
+}
+
 async function authHeaders(): Promise<HeadersInit> {
   const [accessToken, orgToken] = await Promise.all([
     getAccessToken(),
@@ -125,10 +134,70 @@ export async function listInvoices(query: InvoiceQueryInput) {
   };
 }
 
-export async function createInvoice(input: InvoiceCreateInput) {
-  // TODO: POST `${invoiceServiceUrl}/invoices` with auth headers + body.
-  void input;
-  throw new Error("not implemented");
+// 12 hex chars from a UUID: ~48 bits of randomness, short enough to fit
+// upstream's reference/number column limits (existing values are 13-17 chars).
+function shortId(): string {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+}
+
+export async function createInvoice(
+  input: InvoiceCreateInput,
+): Promise<{ invoiceNumber: string }> {
+  const invoiceNumber = `INV-${shortId()}`;
+  const invoiceReference = `#${shortId()}`;
+
+  const body = {
+    invoices: [
+      {
+        bankAccount: {
+          bankId: "",
+          accountName: input.accountName,
+          accountNumber: input.accountNumber,
+          sortCode: input.sortCode,
+        },
+        customer: {
+          contact: {
+            firstName: input.customerFirstName,
+            lastName: input.customerLastName,
+            email: input.email,
+            mobileNumber: input.mobileNumber,
+          },
+        },
+        invoiceReference,
+        invoiceNumber,
+        currency: input.currency,
+        invoiceDate: input.invoiceDate,
+        dueDate: input.dueDate,
+        description: input.description || undefined,
+        items: [
+          {
+            itemReference: `ITEM-${shortId()}`,
+            itemName: input.itemName,
+            description: input.itemDescription,
+            quantity: input.quantity,
+            rate: input.rate,
+            itemUOM: input.itemUOM,
+          },
+        ],
+      },
+    ],
+  };
+
+  const res = await fetch(`${invoiceServiceUrl}/invoices`, {
+    method: "POST",
+    headers: {
+      ...(await authHeaders()),
+      "Operation-Mode": "SYNC",
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  throwIfUnauthorized(res);
+  if (!res.ok) throw new Error(await describeUpstreamError(res));
+
+  return { invoiceNumber };
 }
 
 export async function getInvoice(id: string) {
