@@ -26,8 +26,8 @@ export default async function InvoicesPage({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="flex min-h-0 flex-1 flex-col gap-6">
+      <div className="flex shrink-0 items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Invoices</h1>
         <Button asChild>
           <Link href="/invoices/new">

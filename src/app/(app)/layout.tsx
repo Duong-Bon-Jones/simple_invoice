@@ -20,8 +20,8 @@ export default async function AppLayout({
   const name = await getDisplayName();
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
+    <div className="flex h-screen flex-col">
+      <header className="shrink-0 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
           <Link
             href="/invoices"
@@ -47,7 +47,7 @@ export default async function AppLayout({
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-6 py-10">
+      <main className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-y-auto px-6 py-10">
         {children}
       </main>
     </div>

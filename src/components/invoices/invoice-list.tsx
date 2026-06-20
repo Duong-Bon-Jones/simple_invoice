@@ -24,7 +24,7 @@ export async function InvoiceList({ query }: { query: InvoiceQueryInput }) {
 
   if (result.invoices.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-dashed py-16 text-center">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg border border-dashed py-16 text-center">
         <p className="text-sm font-medium text-foreground">No invoices found</p>
         <p className="text-sm text-muted-foreground">
           Try adjusting your search or filters.
@@ -34,7 +34,7 @@ export async function InvoiceList({ query }: { query: InvoiceQueryInput }) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
       <InvoiceTable invoices={result.invoices} />
       <InvoicePagination
         pageNum={result.paging.pageNum}
