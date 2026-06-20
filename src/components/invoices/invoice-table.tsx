@@ -35,8 +35,8 @@ function formatDate(value: string | undefined): string {
 
 export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
   return (
-    <Table>
-      <TableHeader>
+    <Table containerClassName="min-h-0 flex-1 overflow-y-auto scroll-thin rounded-md border">
+      <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
           <TableHead>Invoice #</TableHead>
           <TableHead>Customer</TableHead>
