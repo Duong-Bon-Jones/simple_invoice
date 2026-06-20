@@ -30,7 +30,7 @@ export function InvoicePagination({ pageNum, pageSize, total }: Props) {
   }
 
   return (
-    <div className="flex items-center justify-between border-t pt-4">
+    <div className="sticky bottom-0 z-10 -mb-10 flex items-center justify-between border-t bg-background/95 px-1 py-4 backdrop-blur">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Select
           value={String(pageSize)}
