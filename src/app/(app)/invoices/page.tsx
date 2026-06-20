@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LinkStatusIcon } from "@/components/ui/link-status-icon";
+import { InvoiceTableSkeleton } from "@/components/invoices/invoice-table-skeleton";
 import { InvoicesView } from "@/components/invoices/invoices-view";
 
 export default function InvoicesPage() {
@@ -17,7 +19,9 @@ export default function InvoicesPage() {
         </Button>
       </div>
 
-      <InvoicesView />
+      <Suspense fallback={<InvoiceTableSkeleton />}>
+        <InvoicesView />
+      </Suspense>
     </div>
   );
 }
