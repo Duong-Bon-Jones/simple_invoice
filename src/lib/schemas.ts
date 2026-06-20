@@ -40,6 +40,8 @@ export const InvoiceCreateSchema = z
   });
 export type InvoiceCreateInput = z.infer<typeof InvoiceCreateSchema>;
 
+export const PageSizeSchema = z.coerce.number().int().min(1).max(100);
+
 export const InvoiceQuerySchema = z.object({
   keyword: z.string().trim().optional(),
   status: z.string().optional(),
@@ -50,7 +52,7 @@ export const InvoiceQuerySchema = z.object({
     .default("CREATED_DATE"),
   ordering: z.enum(["ASCENDING", "DESCENDING"]).default("DESCENDING"),
   pageNum: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  pageSize: PageSizeSchema.default(10),
 });
 export type InvoiceQueryInput = z.infer<typeof InvoiceQuerySchema>;
 

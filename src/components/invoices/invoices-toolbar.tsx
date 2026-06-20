@@ -46,15 +46,13 @@ export function InvoicesToolbar() {
   const sortValue = `${sortBy}:${ordering}`;
   const fromDate = searchParams.get("fromDate") ?? "";
   const toDate = searchParams.get("toDate") ?? "";
-  const pageSize = searchParams.get("pageSize") ?? "10";
 
   const hasFilters =
     keyword ||
     status !== "all" ||
     fromDate ||
     toDate ||
-    sortValue !== "CREATED_DATE:DESCENDING" ||
-    pageSize !== "10";
+    sortValue !== "CREATED_DATE:DESCENDING";
 
   function handleClear() {
     setKeyword("");

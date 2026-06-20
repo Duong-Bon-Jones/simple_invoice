@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCookieState } from "@/hooks/use-cookie-state";
+import { PAGE_SIZE_COOKIE } from "./page-size-cookie";
 import { useInvoiceParams } from "./use-invoice-params";
 
 const PAGE_SIZE_OPTIONS = ["10", "20", "50", "100"];
@@ -21,7 +24,12 @@ type Props = {
 };
 
 export function InvoicePagination({ pageNum, pageSize, total }: Props) {
-  const { setFilter, setPage } = useInvoiceParams();
+  const router = useRouter();
+  const { setPage } = useInvoiceParams();
+  const [, setPageSizeCookie] = useCookieState(
+    PAGE_SIZE_COOKIE,
+    String(pageSize),
+  );
   const [isPending, startTransition] = useTransition();
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -34,9 +42,13 @@ export function InvoicePagination({ pageNum, pageSize, total }: Props) {
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Select
           value={String(pageSize)}
-          onValueChange={(value) =>
-            startTransition(() => setFilter({ pageSize: value }))
-          }
+          onValueChange={(value) => {
+            setPageSizeCookie(value);
+            startTransition(() => {
+              setPage(1);
+              router.refresh();
+            });
+          }}
         >
           <SelectTrigger size="sm" className="w-27.5" aria-label="Page size">
             <SelectValue />

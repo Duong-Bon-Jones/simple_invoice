@@ -1,18 +1,29 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PAGE_SIZE_COOKIE } from "@/components/invoices/page-size-cookie";
 import { InvoicesToolbar } from "@/components/invoices/invoices-toolbar";
 import { InvoiceList } from "@/components/invoices/invoice-list";
 import { InvoiceTableSkeleton } from "@/components/invoices/invoice-table-skeleton";
-import { InvoiceQuerySchema } from "@/lib/schemas";
+import { InvoiceQuerySchema, PageSizeSchema } from "@/lib/schemas";
 
 export default async function InvoicesPage({
   searchParams,
 }: PageProps<"/invoices">) {
   const sp = await searchParams;
   const parsed = InvoiceQuerySchema.safeParse(sp);
-  const query = parsed.success ? parsed.data : InvoiceQuerySchema.parse({});
+  const base = parsed.success ? parsed.data : InvoiceQuerySchema.parse({});
+
+  const cookieStore = await cookies();
+  const pageSizeCookie = PageSizeSchema.safeParse(
+    cookieStore.get(PAGE_SIZE_COOKIE)?.value,
+  );
+  const query = {
+    ...base,
+    pageSize: pageSizeCookie.success ? pageSizeCookie.data : base.pageSize,
+  };
 
   return (
     <div className="flex flex-col gap-6">
