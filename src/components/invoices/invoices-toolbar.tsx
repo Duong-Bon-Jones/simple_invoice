@@ -12,8 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useInvoiceFilterTransition } from "./invoice-filter-transition";
-import { useInvoiceParams } from "./use-invoice-params";
+import { useInvoicesView } from "./invoices-view-context";
 
 const STATUS_OPTIONS = ["Due", "Paid", "Overdue", "Cancelled"];
 
@@ -29,25 +28,23 @@ const SORT_OPTIONS = [
 const SEARCH_DEBOUNCE_MS = 350;
 
 export function InvoicesToolbar() {
-  const { searchParams, setFilter, clearFilters } = useInvoiceParams();
-  const [keyword, setKeyword] = useState(searchParams.get("keyword") ?? "");
-  const { startNavigation } = useInvoiceFilterTransition();
+  const { filters, setFilter, clearFilters } = useInvoicesView();
+  const [keyword, setKeyword] = useState(filters.keyword ?? "");
 
   useEffect(() => {
-    const current = searchParams.get("keyword") ?? "";
+    const current = filters.keyword ?? "";
     if (keyword === current) return;
     const id = setTimeout(() => {
-      startNavigation(() => setFilter({ keyword: keyword || undefined }));
+      setFilter({ keyword: keyword || undefined });
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(id);
-  }, [keyword, searchParams, setFilter, startNavigation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyword]);
 
-  const status = searchParams.get("status") ?? "all";
-  const sortBy = searchParams.get("sortBy") ?? "CREATED_DATE";
-  const ordering = searchParams.get("ordering") ?? "DESCENDING";
-  const sortValue = `${sortBy}:${ordering}`;
-  const fromDate = searchParams.get("fromDate") ?? "";
-  const toDate = searchParams.get("toDate") ?? "";
+  const status = filters.status ?? "all";
+  const sortValue = `${filters.sortBy}:${filters.ordering}`;
+  const fromDate = filters.fromDate ?? "";
+  const toDate = filters.toDate ?? "";
 
   const hasFilters =
     keyword ||
@@ -58,7 +55,7 @@ export function InvoicesToolbar() {
 
   function handleClear() {
     setKeyword("");
-    startNavigation(() => clearFilters());
+    clearFilters();
   }
 
   return (
@@ -77,9 +74,7 @@ export function InvoicesToolbar() {
       <Select
         value={status}
         onValueChange={(value) =>
-          startNavigation(() =>
-            setFilter({ status: value === "all" ? undefined : value }),
-          )
+          setFilter({ status: value === "all" ? undefined : value })
         }
       >
         <SelectTrigger className="w-37.5" aria-label="Filter by status">
@@ -99,9 +94,10 @@ export function InvoicesToolbar() {
         value={sortValue}
         onValueChange={(value) => {
           const [nextSortBy, nextOrdering] = value.split(":");
-          startNavigation(() =>
-            setFilter({ sortBy: nextSortBy, ordering: nextOrdering }),
-          );
+          setFilter({
+            sortBy: nextSortBy as typeof filters.sortBy,
+            ordering: nextOrdering as typeof filters.ordering,
+          });
         }}
       >
         <SelectTrigger className="w-47.5" aria-label="Sort invoices">
@@ -120,13 +116,13 @@ export function InvoicesToolbar() {
         <DateField
           label="From date"
           value={fromDate}
-          onChange={(value) => startNavigation(() => setFilter({ fromDate: value }))}
+          onChange={(value) => setFilter({ fromDate: value })}
         />
         <span className="text-sm text-muted-foreground">to</span>
         <DateField
           label="To date"
           value={toDate}
-          onChange={(value) => startNavigation(() => setFilter({ toDate: value }))}
+          onChange={(value) => setFilter({ toDate: value })}
         />
       </div>
 
