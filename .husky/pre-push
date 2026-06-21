@@ -1,0 +1,6 @@
+git fetch origin main --quiet 2>/dev/null
+if git rev-parse --verify origin/main >/dev/null 2>&1; then
+  pnpm vitest run --changed origin/main
+else
+  pnpm vitest run --changed
+fi
