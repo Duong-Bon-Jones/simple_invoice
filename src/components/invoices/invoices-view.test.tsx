@@ -12,6 +12,8 @@ vi.mock("./invoices-view-context", () => ({
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  usePathname: () => "/invoices",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const mockUseInvoicesView = vi.mocked(useInvoicesView);

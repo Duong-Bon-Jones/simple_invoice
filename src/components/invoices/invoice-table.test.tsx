@@ -28,6 +28,23 @@ describe("InvoiceTable", () => {
     expect(screen.getByText("Jan 15, 2024")).toBeInTheDocument();
   });
 
+  it("appends the current list url as a from query param when given", () => {
+    const invoices: Invoice[] = [
+      { invoiceId: "abc", invoiceNumber: "INV-001" },
+    ];
+    render(
+      <InvoiceTable
+        invoices={invoices}
+        currentListUrl="/invoices?pageNum=2&sortBy=DUE_DATE"
+      />,
+    );
+    const link = screen.getByRole("link", { name: "INV-001" });
+    expect(link).toHaveAttribute(
+      "href",
+      "/invoices/abc?from=%2Finvoices%3FpageNum%3D2%26sortBy%3DDUE_DATE",
+    );
+  });
+
   it("renders plain text and dashes for missing optional fields", () => {
     const invoices: Invoice[] = [{ invoiceNumber: "INV-002" }];
     render(<InvoiceTable invoices={invoices} />);

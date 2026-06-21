@@ -8,35 +8,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
+import { formatCurrency, formatDate } from "@/lib/format";
 import type { Invoice } from "@/lib/schemas";
 
 function activeStatusLabel(status: Invoice["status"]): string | undefined {
   return status?.find((s) => s.value)?.key;
 }
 
-function formatAmount(
-  amount: number | undefined,
-  currency: string | undefined,
-): string {
-  if (amount === undefined) return "—";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency || "USD",
-  }).format(amount);
-}
+export function InvoiceTable({
+  invoices,
+  currentListUrl,
+}: {
+  invoices: Invoice[];
+  currentListUrl?: string;
+}) {
+  const fromQuery = currentListUrl
+    ? `?from=${encodeURIComponent(currentListUrl)}`
+    : "";
 
-function formatDate(value: string | undefined): string {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
   return (
     <Table containerClassName="min-h-0 flex-1 overflow-y-auto scroll-thin rounded-md border">
       <TableHeader className="sticky top-0 z-10 bg-background">
@@ -56,7 +45,7 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
             <TableCell className="max-w-[140px] truncate font-mono text-sm">
               {invoice.invoiceId ? (
                 <Link
-                  href={`/invoices/${invoice.invoiceId}`}
+                  href={`/invoices/${invoice.invoiceId}${fromQuery}`}
                   className="text-brand hover:underline"
                 >
                   {invoice.invoiceNumber ?? invoice.invoiceId}
@@ -70,7 +59,7 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
               {invoice.description || "—"}
             </TableCell>
             <TableCell className="text-right font-mono">
-              {formatAmount(invoice.totalAmount, invoice.currency)}
+              {formatCurrency(invoice.totalAmount, invoice.currency)}
             </TableCell>
             <TableCell>
               <InvoiceStatusBadge status={activeStatusLabel(invoice.status)} />

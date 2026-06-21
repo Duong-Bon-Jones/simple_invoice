@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname, useSearchParams } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SessionExpiredDialog } from "@/components/session-expired-dialog";
 import { SessionExpiredError } from "@/lib/client-errors";
@@ -11,6 +12,9 @@ import { InvoicePagination } from "./invoice-pagination";
 
 function InvoicesContent() {
   const { invoices, error, isFetching } = useInvoicesView();
+  const pathname = usePathname();
+  const search = useSearchParams().toString();
+  const currentListUrl = search ? `${pathname}?${search}` : pathname;
 
   if (error instanceof SessionExpiredError) return <SessionExpiredDialog />;
 
@@ -39,7 +43,7 @@ function InvoicesContent() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <InvoiceTable invoices={invoices} />
+      <InvoiceTable invoices={invoices} currentListUrl={currentListUrl} />
     </div>
   );
 }
