@@ -1,5 +1,7 @@
 # Simple Invoice
 
+`Duong Pham (duongpt.unix@gmail.com)`'s submission for the 101Digital coding challenge.
+
 A small invoice app built on **Next.js 16 (App Router)** that talks to the
 [101Digital](https://www.101digital.io/) platform. You can log in, browse/filter/paginate
 your invoices, and create new ones — all without any third-party credentials ever reaching
