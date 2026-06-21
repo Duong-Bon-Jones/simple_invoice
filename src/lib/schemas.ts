@@ -68,7 +68,9 @@ const InvoiceSchema = z
       .object({ id: z.string().optional(), name: z.string().optional() })
       .partial()
       .optional(),
-    status: z.array(z.object({ key: z.string(), value: z.boolean() })).optional(),
+    status: z
+      .array(z.object({ key: z.string(), value: z.boolean() }))
+      .optional(),
     description: z.string().optional(),
   })
   .passthrough();

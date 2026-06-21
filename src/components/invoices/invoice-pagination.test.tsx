@@ -55,7 +55,10 @@ describe("InvoicePagination", () => {
   });
 
   it("disables both buttons while fetching", () => {
-    mockView({ paging: { pageNum: 2, pageSize: 10, total: 25 }, isFetching: true });
+    mockView({
+      paging: { pageNum: 2, pageSize: 10, total: 25 },
+      isFetching: true,
+    });
     render(<InvoicePagination />);
     expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
     expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
@@ -80,7 +83,9 @@ describe("InvoicePagination", () => {
     render(<InvoicePagination />);
 
     await userEvent.click(screen.getByRole("combobox", { name: /page size/i }));
-    await userEvent.click(await screen.findByRole("option", { name: "20 / page" }));
+    await userEvent.click(
+      await screen.findByRole("option", { name: "20 / page" }),
+    );
 
     expect(view.setPageSize).toHaveBeenCalledWith(20);
   });

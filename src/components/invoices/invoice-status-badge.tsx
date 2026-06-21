@@ -9,7 +9,8 @@ const STATUS_STYLES: Record<string, string> = {
 
 export function InvoiceStatusBadge({ status }: { status?: string }) {
   const key = status?.toLowerCase() ?? "";
-  const className = STATUS_STYLES[key] ?? "bg-muted text-muted-foreground border-border";
+  const className =
+    STATUS_STYLES[key] ?? "bg-muted text-muted-foreground border-border";
 
   return (
     <Badge variant="outline" className={className}>

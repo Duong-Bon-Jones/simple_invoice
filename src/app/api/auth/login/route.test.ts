@@ -7,9 +7,8 @@ vi.mock("@/lib/upstream", () => ({
 }));
 
 const { setSession } = await import("@/lib/session");
-const { AuthError, exchangeCredentialsForToken } = await import(
-  "@/lib/upstream"
-);
+const { AuthError, exchangeCredentialsForToken } =
+  await import("@/lib/upstream");
 const { POST } = await import("./route");
 
 function request(body: unknown) {

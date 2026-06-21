@@ -8,7 +8,9 @@ function readLocalStorage(key: string): string | null {
 }
 
 export function useLocalStorage(key: string, defaultValue: string) {
-  const [value, setValue] = useState(() => readLocalStorage(key) ?? defaultValue);
+  const [value, setValue] = useState(
+    () => readLocalStorage(key) ?? defaultValue,
+  );
 
   function update(next: string) {
     window.localStorage.setItem(key, next);

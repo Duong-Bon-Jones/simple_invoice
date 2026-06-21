@@ -1,10 +1,7 @@
 import { act, render } from "@testing-library/react";
 import { useEffect } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  InvoicesViewProvider,
-  useInvoicesView,
-} from "./invoices-view-context";
+import { InvoicesViewProvider, useInvoicesView } from "./invoices-view-context";
 import { useInvoices } from "@/hooks/use-invoices";
 
 const routerMock = { replace: vi.fn(), refresh: vi.fn() };

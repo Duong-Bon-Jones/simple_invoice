@@ -79,7 +79,14 @@ describe("InvoicesToolbar", () => {
   });
 
   it("enables clear filters and resets keyword when a filter is active", async () => {
-    const view = mockView({ filters: { sortBy: "CREATED_DATE", ordering: "DESCENDING", pageNum: 1, keyword: "acme" } as never });
+    const view = mockView({
+      filters: {
+        sortBy: "CREATED_DATE",
+        ordering: "DESCENDING",
+        pageNum: 1,
+        keyword: "acme",
+      } as never,
+    });
     render(<InvoicesToolbar />);
 
     const clearButton = screen.getByLabelText("Clear filters");

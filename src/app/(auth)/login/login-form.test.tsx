@@ -41,7 +41,9 @@ describe("LoginForm", () => {
     await userEvent.type(screen.getByLabelText("Password"), "password123");
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    await waitFor(() => expect(routerMock.push).toHaveBeenCalledWith("/invoices"));
+    await waitFor(() =>
+      expect(routerMock.push).toHaveBeenCalledWith("/invoices"),
+    );
     expect(routerMock.refresh).toHaveBeenCalled();
   });
 
@@ -65,6 +67,8 @@ describe("LoginForm", () => {
     await userEvent.type(screen.getByLabelText("Password"), "password123");
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(await screen.findByText("Login failed, try again")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Login failed, try again"),
+    ).toBeInTheDocument();
   });
 });

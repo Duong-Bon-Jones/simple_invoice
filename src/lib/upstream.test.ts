@@ -106,9 +106,7 @@ describe("exchangeCredentialsForToken", () => {
       )
       .mockResolvedValueOnce(mockJson(200, { data: { memberships: [] } }));
 
-    await expect(
-      exchangeCredentialsForToken("user", "pass"),
-    ).rejects.toThrow();
+    await expect(exchangeCredentialsForToken("user", "pass")).rejects.toThrow();
   });
 
   it("throws a generic Error when the membership lookup is not ok", async () => {
@@ -191,9 +189,7 @@ const CREATE_INPUT = {
 describe("createInvoice", () => {
   it("throws AuthError on 401", async () => {
     fetchMock.mockResolvedValueOnce(mockJson(401, {}));
-    await expect(createInvoice(CREATE_INPUT)).rejects.toBeInstanceOf(
-      AuthError,
-    );
+    await expect(createInvoice(CREATE_INPUT)).rejects.toBeInstanceOf(AuthError);
   });
 
   it("throws an upstream-described error using errors[0].message", async () => {

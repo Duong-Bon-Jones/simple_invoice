@@ -22,7 +22,8 @@ function renderProvider() {
 }
 
 function setDisplayNameCookie(value: string | null) {
-  document.cookie = "display_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+  document.cookie =
+    "display_name=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
   if (value !== null) {
     document.cookie = `display_name=${encodeURIComponent(value)}`;
   }

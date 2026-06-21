@@ -34,7 +34,10 @@ beforeEach(() => {
 describe("createInvoiceAction", () => {
   it("returns a validation error without calling the upstream when input is invalid", async () => {
     const result = await createInvoiceAction({});
-    expect(result).toEqual({ ok: false, error: "Please check the form fields." });
+    expect(result).toEqual({
+      ok: false,
+      error: "Please check the form fields.",
+    });
     expect(createInvoice).not.toHaveBeenCalled();
   });
 

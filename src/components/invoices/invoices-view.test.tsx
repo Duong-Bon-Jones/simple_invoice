@@ -5,7 +5,8 @@ import { useInvoicesView } from "./invoices-view-context";
 import { SessionExpiredError } from "@/lib/client-errors";
 
 vi.mock("./invoices-view-context", () => ({
-  InvoicesViewProvider: ({ children }: { children: React.ReactNode }) => children,
+  InvoicesViewProvider: ({ children }: { children: React.ReactNode }) =>
+    children,
   useInvoicesView: vi.fn(),
 }));
 
@@ -17,7 +18,11 @@ const mockUseInvoicesView = vi.mocked(useInvoicesView);
 
 function mockView(overrides: Partial<ReturnType<typeof useInvoicesView>> = {}) {
   const base = {
-    filters: { sortBy: "CREATED_DATE", ordering: "DESCENDING", pageNum: 1 } as never,
+    filters: {
+      sortBy: "CREATED_DATE",
+      ordering: "DESCENDING",
+      pageNum: 1,
+    } as never,
     pageSize: 10,
     invoices: undefined,
     paging: { pageNum: 1, pageSize: 10, total: 0 },

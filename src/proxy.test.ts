@@ -44,9 +44,7 @@ describe("proxy", () => {
     vi.stubEnv("NODE_ENV", "development");
     const { proxy: devProxy } = await import("./proxy");
     const res = devProxy(request("/invoices", "token"));
-    expect(res.headers.get("Content-Security-Policy")).toContain(
-      "unsafe-eval",
-    );
+    expect(res.headers.get("Content-Security-Policy")).toContain("unsafe-eval");
     vi.stubEnv("NODE_ENV", prevEnv ?? "test");
     vi.resetModules();
   });

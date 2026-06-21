@@ -14,7 +14,9 @@ beforeEach(() => {
   routerMock.refresh.mockReset();
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) }),
+    vi
+      .fn()
+      .mockResolvedValue({ ok: true, status: 200, json: async () => ({}) }),
   );
 });
 
@@ -35,7 +37,9 @@ describe("LogoutButton", () => {
     await userEvent.click(logOutButtons[logOutButtons.length - 1]);
 
     await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith("/api/auth/logout", { method: "POST" }),
+      expect(fetch).toHaveBeenCalledWith("/api/auth/logout", {
+        method: "POST",
+      }),
     );
     expect(routerMock.push).toHaveBeenCalledWith("/login");
     expect(routerMock.refresh).toHaveBeenCalled();

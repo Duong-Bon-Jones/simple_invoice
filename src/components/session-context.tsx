@@ -26,7 +26,9 @@ const SessionContext = createContext<string | null>(null);
 export function SessionProvider({ children }: { children: ReactNode }) {
   const name = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  return <SessionContext.Provider value={name}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={name}>{children}</SessionContext.Provider>
+  );
 }
 
 export function useSession(): string | null {

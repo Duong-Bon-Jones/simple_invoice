@@ -25,7 +25,10 @@ export async function setSession(tokens: {
   if (tokens.name) {
     // Not httpOnly: the display name isn't a secret, and the client needs to
     // read it directly to render the (app) layout statically.
-    cookieStore.set(DISPLAY_NAME_COOKIE, tokens.name, { ...options, httpOnly: false });
+    cookieStore.set(DISPLAY_NAME_COOKIE, tokens.name, {
+      ...options,
+      httpOnly: false,
+    });
   }
 }
 

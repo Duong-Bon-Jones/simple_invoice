@@ -20,12 +20,17 @@ function toSearchParams(query: InvoiceQueryInput): URLSearchParams {
   return params;
 }
 
-async function fetchInvoices(query: InvoiceQueryInput): Promise<InvoicesResult> {
+async function fetchInvoices(
+  query: InvoiceQueryInput,
+): Promise<InvoicesResult> {
   const res = await fetch(`/api/invoices?${toSearchParams(query)}`);
   if (res.status === 401) throw new SessionExpiredError();
   if (!res.ok) throw new Error("Couldn't load invoices");
 
-  const body = (await res.json()) as { success: boolean; data?: InvoicesResult };
+  const body = (await res.json()) as {
+    success: boolean;
+    data?: InvoicesResult;
+  };
   if (!body.success || !body.data) throw new Error("Couldn't load invoices");
   return body.data;
 }

@@ -47,7 +47,11 @@ describe("useInvoices", () => {
   });
 
   it("throws SessionExpiredError on a 401 and does not retry", async () => {
-    fetchMock.mockResolvedValue({ status: 401, ok: false, json: async () => ({}) });
+    fetchMock.mockResolvedValue({
+      status: 401,
+      ok: false,
+      json: async () => ({}),
+    });
 
     const { result } = renderHook(() => useInvoices(QUERY), { wrapper });
     await waitFor(() => expect(result.current.isError).toBe(true));
@@ -69,7 +73,10 @@ describe("useInvoices", () => {
   });
 
   it("returns the data payload on success", async () => {
-    const data = { invoices: [{ invoiceId: "1" }], paging: { pageNum: 1, pageSize: 10, total: 1 } };
+    const data = {
+      invoices: [{ invoiceId: "1" }],
+      paging: { pageNum: 1, pageSize: 10, total: 1 },
+    };
     fetchMock.mockResolvedValueOnce({
       status: 200,
       ok: true,

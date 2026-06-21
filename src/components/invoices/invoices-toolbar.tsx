@@ -28,7 +28,8 @@ const SORT_OPTIONS = [
 const SEARCH_DEBOUNCE_MS = 350;
 
 export function InvoicesToolbar() {
-  const { filters, setFilter, clearFilters, refetch, isFetching } = useInvoicesView();
+  const { filters, setFilter, clearFilters, refetch, isFetching } =
+    useInvoicesView();
   const [keyword, setKeyword] = useState(filters.keyword ?? "");
   const skipNextDebounce = useRef(false);
 
@@ -161,7 +162,9 @@ export function InvoicesToolbar() {
             onClick={() => refetch()}
             aria-label="Refresh invoices"
           >
-            <RefreshCw className={`size-4 ${isFetching ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`size-4 ${isFetching ? "animate-spin" : ""}`}
+            />
             <span className="hidden xl:inline">Refresh</span>
           </Button>
         </div>

@@ -7,7 +7,10 @@ export async function GET(
   ctx: RouteContext<"/api/invoices/[id]">,
 ) {
   if (!(await hasSession())) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 },
+    );
   }
 
   const { id } = await ctx.params;

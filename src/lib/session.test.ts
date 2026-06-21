@@ -20,13 +20,8 @@ vi.mock("next/headers", () => ({
   }),
 }));
 
-const {
-  setSession,
-  getAccessToken,
-  getOrgToken,
-  hasSession,
-  clearSession,
-} = await import("@/lib/session");
+const { setSession, getAccessToken, getOrgToken, hasSession, clearSession } =
+  await import("@/lib/session");
 
 beforeEach(() => {
   cookieStore.clear();

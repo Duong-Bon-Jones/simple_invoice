@@ -30,9 +30,7 @@ export function SessionExpiredDialog() {
 
   return (
     <AlertDialog open>
-      <AlertDialogContent
-        onEscapeKeyDown={(event) => event.preventDefault()}
-      >
+      <AlertDialogContent onEscapeKeyDown={(event) => event.preventDefault()}>
         <AlertDialogHeader>
           <AlertDialogTitle>Session expired</AlertDialogTitle>
           <AlertDialogDescription>

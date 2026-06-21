@@ -21,8 +21,15 @@ export function InvoicePagination() {
   return (
     <div className="flex shrink-0 items-center justify-between gap-2 border-t bg-background px-1 py-4">
       <div className="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
-        <Select value={String(pageSize)} onValueChange={(value) => setPageSize(Number(value))}>
-          <SelectTrigger size="sm" className="w-27.5 shrink-0" aria-label="Page size">
+        <Select
+          value={String(pageSize)}
+          onValueChange={(value) => setPageSize(Number(value))}
+        >
+          <SelectTrigger
+            size="sm"
+            className="w-27.5 shrink-0"
+            aria-label="Page size"
+          >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

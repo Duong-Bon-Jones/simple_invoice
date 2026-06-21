@@ -14,7 +14,10 @@ function activeStatusLabel(status: Invoice["status"]): string | undefined {
   return status?.find((s) => s.value)?.key;
 }
 
-function formatAmount(amount: number | undefined, currency: string | undefined): string {
+function formatAmount(
+  amount: number | undefined,
+  currency: string | undefined,
+): string {
   if (amount === undefined) return "—";
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -59,7 +62,7 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
                   {invoice.invoiceNumber ?? invoice.invoiceId}
                 </Link>
               ) : (
-                invoice.invoiceNumber ?? "—"
+                (invoice.invoiceNumber ?? "—")
               )}
             </TableCell>
             <TableCell>{invoice.customer?.name ?? "—"}</TableCell>

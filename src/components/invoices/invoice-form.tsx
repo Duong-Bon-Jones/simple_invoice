@@ -172,9 +172,7 @@ export function InvoiceForm() {
               <form.Field name="mobileNumber">
                 {(field) => (
                   <Field data-invalid={field.state.meta.errors.length > 0}>
-                    <FieldLabel htmlFor={field.name}>
-                      Mobile number
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Mobile number</FieldLabel>
                     <Input
                       id={field.name}
                       inputMode="tel"
@@ -213,9 +211,7 @@ export function InvoiceForm() {
               <form.Field name="accountNumber">
                 {(field) => (
                   <Field data-invalid={field.state.meta.errors.length > 0}>
-                    <FieldLabel htmlFor={field.name}>
-                      Account number
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Account number</FieldLabel>
                     <Input
                       id={field.name}
                       className="font-mono"
@@ -278,9 +274,7 @@ export function InvoiceForm() {
               <form.Field name="invoiceDate">
                 {(field) => (
                   <Field data-invalid={field.state.meta.errors.length > 0}>
-                    <FieldLabel htmlFor={field.name}>
-                      Invoice date
-                    </FieldLabel>
+                    <FieldLabel htmlFor={field.name}>Invoice date</FieldLabel>
                     <DateField
                       label="Invoice date"
                       value={field.state.value}
@@ -374,7 +368,9 @@ export function InvoiceForm() {
                       min="0"
                       step="1"
                       className="font-mono"
-                      value={Number.isNaN(field.state.value) ? "" : field.state.value}
+                      value={
+                        Number.isNaN(field.state.value) ? "" : field.state.value
+                      }
                       onBlur={field.handleBlur}
                       onChange={(e) =>
                         field.handleChange(e.target.valueAsNumber)
@@ -394,7 +390,9 @@ export function InvoiceForm() {
                       min="0"
                       step="0.01"
                       className="font-mono"
-                      value={Number.isNaN(field.state.value) ? "" : field.state.value}
+                      value={
+                        Number.isNaN(field.state.value) ? "" : field.state.value
+                      }
                       onBlur={field.handleBlur}
                       onChange={(e) =>
                         field.handleChange(e.target.valueAsNumber)

@@ -6,14 +6,20 @@ import { InvoiceQuerySchema } from "@/lib/schemas";
 
 export async function GET(request: NextRequest) {
   if (!(await hasSession())) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 401 },
+    );
   }
 
   const parsed = InvoiceQuerySchema.safeParse(
     Object.fromEntries(request.nextUrl.searchParams),
   );
   if (!parsed.success) {
-    return NextResponse.json({ success: false, error: "Invalid query" }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: "Invalid query" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -21,7 +27,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: { invoices, paging } });
   } catch (error) {
     if (error instanceof AuthError) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
     }
     console.error("Failed to load invoices", error);
     return NextResponse.json(

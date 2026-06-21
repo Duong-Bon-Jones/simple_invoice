@@ -22,18 +22,12 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText("First name"), "Jane");
   await userEvent.type(screen.getByLabelText("Last name"), "Doe");
   await userEvent.type(screen.getByLabelText("Email"), "jane@example.com");
-  await userEvent.type(
-    screen.getByLabelText("Mobile number"),
-    "+447911123456",
-  );
+  await userEvent.type(screen.getByLabelText("Mobile number"), "+447911123456");
   await userEvent.type(screen.getByLabelText("Account name"), "Acme");
   await userEvent.type(screen.getByLabelText("Account number"), "12345678");
   await userEvent.type(screen.getByLabelText("Sort code"), "12-34-56");
   await userEvent.type(screen.getByLabelText("Item name"), "Widget");
-  await userEvent.type(
-    screen.getByLabelText("Item description"),
-    "A widget",
-  );
+  await userEvent.type(screen.getByLabelText("Item description"), "A widget");
   const rate = screen.getByLabelText("Rate");
   await userEvent.clear(rate);
   await userEvent.type(rate, "10");
@@ -42,7 +36,9 @@ async function fillRequiredFields() {
 describe("InvoiceForm", () => {
   it("does not call the action when required fields are left blank", async () => {
     render(<InvoiceForm />);
-    await userEvent.click(screen.getByRole("button", { name: "Create invoice" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create invoice" }),
+    );
     expect(mockAction).not.toHaveBeenCalled();
   });
 
@@ -53,7 +49,9 @@ describe("InvoiceForm", () => {
     });
     render(<InvoiceForm />);
     await fillRequiredFields();
-    await userEvent.click(screen.getByRole("button", { name: "Create invoice" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create invoice" }),
+    );
 
     await waitFor(() => expect(mockAction).toHaveBeenCalled());
     expect(mockAction).toHaveBeenCalledWith(
@@ -76,10 +74,14 @@ describe("InvoiceForm", () => {
     });
     render(<InvoiceForm />);
     await fillRequiredFields();
-    await userEvent.click(screen.getByRole("button", { name: "Create invoice" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create invoice" }),
+    );
     await screen.findByText("Invoice created");
 
-    await userEvent.click(screen.getByRole("button", { name: "Create another" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create another" }),
+    );
     expect(screen.getByLabelText("First name")).toBeInTheDocument();
   });
 
@@ -91,7 +93,9 @@ describe("InvoiceForm", () => {
     });
     render(<InvoiceForm />);
     await fillRequiredFields();
-    await userEvent.click(screen.getByRole("button", { name: "Create invoice" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create invoice" }),
+    );
 
     expect(await screen.findByRole("alertdialog")).toBeInTheDocument();
     expect(
@@ -103,7 +107,9 @@ describe("InvoiceForm", () => {
     mockAction.mockResolvedValueOnce({ ok: false, error: "Boom" });
     render(<InvoiceForm />);
     await fillRequiredFields();
-    await userEvent.click(screen.getByRole("button", { name: "Create invoice" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Create invoice" }),
+    );
 
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith("Couldn't create invoice", {
