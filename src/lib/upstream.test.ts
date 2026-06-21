@@ -8,6 +8,7 @@ vi.mock("@/lib/session", () => ({
 
 const {
   AuthError,
+  NotFoundError,
   exchangeCredentialsForToken,
   listInvoices,
   createInvoice,
@@ -232,7 +233,28 @@ describe("createInvoice", () => {
 });
 
 describe("getInvoice", () => {
-  it("throws not implemented", async () => {
-    await expect(getInvoice("1")).rejects.toThrow("not implemented");
+  it("throws AuthError on 401", async () => {
+    fetchMock.mockResolvedValueOnce(mockJson(401, {}));
+    await expect(getInvoice("1")).rejects.toBeInstanceOf(AuthError);
+  });
+
+  it("throws NotFoundError on 404", async () => {
+    fetchMock.mockResolvedValueOnce(mockJson(404, {}));
+    await expect(getInvoice("1")).rejects.toBeInstanceOf(NotFoundError);
+  });
+
+  it("throws NotFoundError on 400 (malformed UUID)", async () => {
+    fetchMock.mockResolvedValueOnce(mockJson(400, {}));
+    await expect(getInvoice("not-a-uuid")).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+  });
+
+  it("returns the parsed data on success", async () => {
+    fetchMock.mockResolvedValueOnce(
+      mockJson(200, { data: { invoiceId: "1", invoiceNumber: "INV-001" } }),
+    );
+    const result = await getInvoice("1");
+    expect(result).toMatchObject({ invoiceId: "1", invoiceNumber: "INV-001" });
   });
 });

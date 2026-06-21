@@ -2,10 +2,11 @@ import "server-only";
 import { z } from "zod";
 import { env, membershipServiceUrl, invoiceServiceUrl } from "@/lib/env";
 import { getAccessToken, getOrgToken } from "@/lib/session";
-import { InvoiceListSchema } from "@/lib/schemas";
+import { InvoiceDetailSchema, InvoiceListSchema } from "@/lib/schemas";
 import type { InvoiceCreateInput, InvoiceQueryInput } from "@/lib/schemas";
 
 export class AuthError extends Error {}
+export class NotFoundError extends Error {}
 
 function throwIfUnauthorized(res: Response) {
   if (res.status === 401) throw new AuthError("Session expired");
@@ -201,7 +202,16 @@ export async function createInvoice(
 }
 
 export async function getInvoice(id: string) {
-  // TODO: GET `${invoiceServiceUrl}/invoices/${id}` with auth headers.
-  void id;
-  throw new Error("not implemented");
+  const res = await fetch(
+    `${invoiceServiceUrl}/invoices/${encodeURIComponent(id)}`,
+    {
+      headers: { ...(await authHeaders()), Accept: "application/json" },
+      cache: "no-store",
+    },
+  );
+  throwIfUnauthorized(res);
+  if (res.status === 404 || res.status === 400) throw new NotFoundError(id);
+  if (!res.ok) throw new Error(await describeUpstreamError(res));
+
+  return InvoiceDetailSchema.parse(await res.json()).data;
 }

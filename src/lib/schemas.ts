@@ -76,6 +76,118 @@ const InvoiceSchema = z
   .passthrough();
 export type Invoice = z.infer<typeof InvoiceSchema>;
 
+const AddressSchema = z
+  .object({
+    addressType: z.string().optional(),
+    premise: z.string().optional(),
+    thoroughfare: z.string().optional(),
+    dependentLocality: z.string().optional(),
+    city: z.string().optional(),
+    county: z.string().optional(),
+    postcode: z.string().optional(),
+    countryCode: z.string().optional(),
+  })
+  .passthrough();
+
+const ExtensionSchema = z
+  .object({
+    id: z.string().optional(),
+    name: z.string().optional(),
+    type: z.enum(["PERCENTAGE", "FIXED_VALUE"]).optional(),
+    value: z.coerce.number().optional(),
+    total: z.coerce.number().optional(),
+    addDeduct: z.enum(["ADD", "DEDUCT"]).optional(),
+  })
+  .passthrough();
+
+const InvoiceItemSchema = z
+  .object({
+    itemReference: z.string().optional(),
+    itemName: z.string().optional(),
+    description: z.string().optional(),
+    quantity: z.coerce.number().optional(),
+    rate: z.coerce.number().optional(),
+    itemUOM: z.string().optional(),
+    amount: z.coerce.number().optional(),
+    netAmount: z.coerce.number().optional(),
+    extensions: z.array(ExtensionSchema).optional(),
+  })
+  .passthrough();
+
+const InvoiceDocumentSchema = z
+  .object({
+    documentId: z.string().optional(),
+    documentName: z.string().optional(),
+    documentUrl: z.string().optional(),
+  })
+  .passthrough();
+
+export const InvoiceDetailSchema = z
+  .object({
+    data: z
+      .object({
+        bankAccount: z
+          .object({
+            bankId: z.string().optional(),
+            sortCode: z.string().optional(),
+            accountName: z.string().optional(),
+            accountNumber: z.string().optional(),
+          })
+          .partial()
+          .optional(),
+        currency: z.string().optional(),
+        currencySymbol: z.string().optional(),
+        type: z.string().optional(),
+        invoiceId: z.string().optional(),
+        invoiceNumber: z.string().optional(),
+        invoiceReference: z.string().optional(),
+        referenceNo: z.string().optional(),
+        invoiceDate: z.string().optional(),
+        dueDate: z.string().optional(),
+        createdAt: z.string().optional(),
+        description: z.string().optional(),
+        status: z
+          .array(z.object({ key: z.string(), value: z.boolean() }))
+          .optional(),
+        customer: z
+          .object({
+            id: z.string().optional(),
+            name: z.string().optional(),
+            contact: z
+              .object({
+                email: z.string().optional(),
+                mobileNumber: z.string().optional(),
+              })
+              .partial()
+              .optional(),
+            addresses: z.array(AddressSchema).optional(),
+          })
+          .partial()
+          .optional(),
+        merchant: z
+          .object({
+            id: z.string().optional(),
+            name: z.string().optional(),
+            addresses: z.array(AddressSchema).optional(),
+          })
+          .partial()
+          .optional(),
+        items: z.array(InvoiceItemSchema).optional(),
+        extensions: z.array(ExtensionSchema).optional(),
+        documents: z.array(InvoiceDocumentSchema).optional(),
+        invoiceSubTotal: z.coerce.number().optional(),
+        totalTax: z.coerce.number().optional(),
+        totalDiscount: z.coerce.number().optional(),
+        totalAmount: z.coerce.number().optional(),
+        totalPaid: z.coerce.number().optional(),
+        balanceAmount: z.coerce.number().optional(),
+        invoiceGrossTotal: z.coerce.number().optional(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+export type InvoiceDetail = z.infer<typeof InvoiceDetailSchema>["data"];
+
 export const InvoiceListSchema = z
   .object({
     data: z.array(InvoiceSchema).default([]),
