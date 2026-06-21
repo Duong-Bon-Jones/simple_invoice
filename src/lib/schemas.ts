@@ -69,6 +69,7 @@ const InvoiceSchema = z
       .partial()
       .optional(),
     status: z.array(z.object({ key: z.string(), value: z.boolean() })).optional(),
+    description: z.string().optional(),
   })
   .passthrough();
 export type Invoice = z.infer<typeof InvoiceSchema>;

@@ -38,8 +38,9 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
     <Table containerClassName="min-h-0 flex-1 overflow-y-auto scroll-thin rounded-md border">
       <TableHeader className="sticky top-0 z-10 bg-background">
         <TableRow>
-          <TableHead>Invoice #</TableHead>
+          <TableHead className="max-w-[140px]">Invoice #</TableHead>
           <TableHead>Customer</TableHead>
+          <TableHead>Description</TableHead>
           <TableHead className="text-right">Amount</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Due date</TableHead>
@@ -49,7 +50,7 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
       <TableBody>
         {invoices.map((invoice, index) => (
           <TableRow key={invoice.invoiceId ?? invoice.invoiceNumber ?? index}>
-            <TableCell className="font-mono text-sm">
+            <TableCell className="max-w-[140px] truncate font-mono text-sm">
               {invoice.invoiceId ? (
                 <Link
                   href={`/invoices/${invoice.invoiceId}`}
@@ -62,6 +63,9 @@ export function InvoiceTable({ invoices }: { invoices: Invoice[] }) {
               )}
             </TableCell>
             <TableCell>{invoice.customer?.name ?? "—"}</TableCell>
+            <TableCell className="max-w-[200px] truncate text-muted-foreground">
+              {invoice.description || "—"}
+            </TableCell>
             <TableCell className="text-right font-mono">
               {formatAmount(invoice.totalAmount, invoice.currency)}
             </TableCell>

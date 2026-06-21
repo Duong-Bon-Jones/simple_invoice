@@ -15,12 +15,14 @@ describe("InvoiceTable", () => {
         createdAt: "2024-01-01",
         customer: { name: "Acme" },
         status: [{ key: "Paid", value: true }],
+        description: "Consulting services",
       },
     ];
     render(<InvoiceTable invoices={invoices} />);
     const link = screen.getByRole("link", { name: "INV-001" });
     expect(link).toHaveAttribute("href", "/invoices/abc");
     expect(screen.getByText("Acme")).toBeInTheDocument();
+    expect(screen.getByText("Consulting services")).toBeInTheDocument();
     expect(screen.getByText("$100.00")).toBeInTheDocument();
     expect(screen.getByText("Paid")).toBeInTheDocument();
     expect(screen.getByText("Jan 15, 2024")).toBeInTheDocument();
