@@ -12,6 +12,9 @@ export async function withSessionGuard<T>(
     return { ok: true, data: await fn() };
   } catch (error) {
     if (error instanceof AuthError) {
+      // Separate boolean instead of string-matching the message: callers
+      // need to reliably detect this case (e.g. to show the session-expired
+      // modal) without depending on exact error text.
       return { ok: false, error: "Session expired", sessionExpired: true };
     }
     return {

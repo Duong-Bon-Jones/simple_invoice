@@ -11,6 +11,9 @@ import { InvoiceStatusBadge } from "./invoice-status-badge";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Invoice } from "@/lib/schemas";
 
+// Searches for the flag set to true rather than reading a single field:
+// status is an array of independent flags upstream (see schemas.ts), not a
+// single enum value.
 function activeStatusLabel(status: Invoice["status"]): string | undefined {
   return status?.find((s) => s.value)?.key;
 }
@@ -22,6 +25,8 @@ export function InvoiceTable({
   invoices: Invoice[];
   currentListUrl?: string;
 }) {
+  // Encoded as a URL string, not client state: it has to survive a full
+  // navigation/reload to the detail page, which client-only state would not.
   const fromQuery = currentListUrl
     ? `?from=${encodeURIComponent(currentListUrl)}`
     : "";

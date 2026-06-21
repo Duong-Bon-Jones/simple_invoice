@@ -31,6 +31,9 @@ export function InvoicesToolbar() {
   const { filters, setFilter, clearFilters, refetch, isFetching } =
     useInvoicesView();
   const [keyword, setKeyword] = useState(filters.keyword ?? "");
+  // Guards against handleClear's setKeyword("") re-triggering this debounce
+  // effect and firing a redundant fetch right after clearFilters() already
+  // navigated.
   const skipNextDebounce = useRef(false);
 
   useEffect(() => {
@@ -44,6 +47,9 @@ export function InvoicesToolbar() {
       setFilter({ keyword: keyword || undefined });
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(id);
+    // setFilter/filters.keyword deliberately excluded: this effect is a
+    // one-way sync from local `keyword` state to the URL, so including the
+    // URL-derived value would create a feedback loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword]);
 

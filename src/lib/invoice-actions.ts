@@ -9,6 +9,9 @@ export async function createInvoiceAction(
 ): Promise<ActionResult<{ invoiceNumber: string }>> {
   const parsed = InvoiceCreateSchema.safeParse(input);
   if (!parsed.success) {
+    // Generic message, not Zod's per-field detail: the form already
+    // validates client-side, so reaching here is a last-resort guard rather
+    // than the user's primary feedback path.
     return { ok: false, error: "Please check the form fields." };
   }
   return withSessionGuard(() => createInvoice(parsed.data));

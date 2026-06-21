@@ -11,6 +11,8 @@ function subscribe() {
 }
 
 function getSnapshot(): string | null {
+  // Decoding is needed because cookie values set via Next's cookies().set()
+  // are URL-encoded; document.cookie returns that raw encoded form as-is.
   const match = document.cookie.match(
     new RegExp(`(?:^|; )${DISPLAY_NAME_COOKIE}=([^;]*)`),
   );

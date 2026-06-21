@@ -30,6 +30,8 @@ export const InvoiceCreateSchema = z
     itemUOM: z.string().min(1, "Required"),
   })
   .superRefine((data, ctx) => {
+    // Plain string comparison is valid here: dates are ISO yyyy-mm-dd, where
+    // lexicographic order matches chronological order.
     if (data.dueDate < data.invoiceDate) {
       ctx.addIssue({
         code: "custom",
@@ -68,11 +70,16 @@ const InvoiceSchema = z
       .object({ id: z.string().optional(), name: z.string().optional() })
       .partial()
       .optional(),
+    // Array of flags, not an enum: mirrors upstream's status shape, which
+    // models status as a set of independent {key, value} flags rather than
+    // a single state.
     status: z
       .array(z.object({ key: z.string(), value: z.boolean() }))
       .optional(),
     description: z.string().optional(),
   })
+  // Keep unknown upstream fields instead of stripping them — these schemas
+  // only validate the fields the UI actually uses, not the full API surface.
   .passthrough();
 export type Invoice = z.infer<typeof InvoiceSchema>;
 
@@ -146,6 +153,7 @@ export const InvoiceDetailSchema = z
         dueDate: z.string().optional(),
         createdAt: z.string().optional(),
         description: z.string().optional(),
+        // Array of flags, same reasoning as InvoiceSchema.status above.
         status: z
           .array(z.object({ key: z.string(), value: z.boolean() }))
           .optional(),

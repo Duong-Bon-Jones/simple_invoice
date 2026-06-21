@@ -38,6 +38,8 @@ export function formatAddress(
 export function formatDate(value: string | undefined): string {
   if (!value) return "—";
   const date = new Date(value);
+  // Fall back to the raw string rather than "—": an unexpected upstream
+  // date format should still show something rather than look like no data.
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString("en-US", {
     year: "numeric",

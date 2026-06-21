@@ -28,6 +28,8 @@ async function authHeaders(): Promise<HeadersInit> {
   ]);
   return {
     Authorization: `Bearer ${accessToken}`,
+    // Always send the header, even empty: omitting it entirely vs. sending ""
+    // behave differently upstream when a session has no org token yet.
     "org-token": orgToken ?? "",
   };
 }
@@ -144,6 +146,8 @@ function shortId(): string {
 export async function createInvoice(
   input: InvoiceCreateInput,
 ): Promise<{ invoiceNumber: string }> {
+  // Separate random IDs, not derived from one value: upstream tracks
+  // invoiceNumber and invoiceReference as distinct identifiers.
   const invoiceNumber = `INV-${shortId()}`;
   const invoiceReference = `#${shortId()}`;
 
@@ -169,7 +173,7 @@ export async function createInvoice(
         currency: input.currency,
         invoiceDate: input.invoiceDate,
         dueDate: input.dueDate,
-        description: input.description || undefined,
+        description: input.description || undefined, // upstream rejects "" for this field
         items: [
           {
             itemReference: `ITEM-${shortId()}`,

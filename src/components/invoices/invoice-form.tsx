@@ -368,6 +368,8 @@ export function InvoiceForm() {
                       min="0"
                       step="1"
                       className="font-mono"
+                      // Clearing the input produces NaN in form state; without
+                      // this guard the input would literally display "NaN".
                       value={
                         Number.isNaN(field.state.value) ? "" : field.state.value
                       }
@@ -390,6 +392,7 @@ export function InvoiceForm() {
                       min="0"
                       step="0.01"
                       className="font-mono"
+                      // Same NaN guard as quantity above.
                       value={
                         Number.isNaN(field.state.value) ? "" : field.state.value
                       }

@@ -40,6 +40,8 @@ export function useInvoices(query: InvoiceQueryInput) {
     queryKey: ["invoices", query],
     queryFn: () => fetchInvoices(query),
     placeholderData: keepPreviousData,
+    // A 401 isn't transient — retrying just wastes 3 round trips before the
+    // session-expired modal would show anyway.
     retry: (failureCount, error) =>
       error instanceof SessionExpiredError ? false : failureCount < 3,
   });

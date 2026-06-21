@@ -53,6 +53,8 @@ export function LoginForm() {
       });
       const result = await response.json();
 
+      // Two distinct failure modes: a non-2xx transport/server error, or a
+      // 200 with {success: false} for a handled case like bad credentials.
       if (!response.ok || !result.success) {
         setFormError(
           typeof result.error === "string"

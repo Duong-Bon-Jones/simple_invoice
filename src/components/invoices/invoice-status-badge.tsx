@@ -8,6 +8,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export function InvoiceStatusBadge({ status }: { status?: string }) {
+  // Normalize case: upstream status casing isn't guaranteed consistent, and
+  // STATUS_STYLES keys are lowercase by convention.
   const key = status?.toLowerCase() ?? "";
   const className =
     STATUS_STYLES[key] ?? "bg-muted text-muted-foreground border-border";

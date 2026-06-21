@@ -14,6 +14,9 @@ import { InvoiceStatusBadge } from "./invoice-status-badge";
 import { formatAddress, formatCurrency, formatDate } from "@/lib/format";
 import type { InvoiceDetail as InvoiceDetailData } from "@/lib/schemas";
 
+// These document URLs come from the upstream API; without an allowlist, a
+// crafted javascript:/unknown-scheme URL could execute or misbehave when
+// rendered as a link.
 const SAFE_URL_SCHEMES = new Set(["http:", "https:", "mailto:"]);
 
 function safeUrl(url: string | undefined): string | undefined {
@@ -37,6 +40,8 @@ type ItemExtension = NonNullable<
 >[number];
 
 function extensionLabel(extension: ItemExtension): string {
+  // Extensions model both surcharges and discounts under one shape, so
+  // addDeduct decides the sign of an otherwise-positive value.
   const sign = extension.addDeduct === "DEDUCT" ? "-" : "+";
   const value =
     extension.type === "PERCENTAGE"

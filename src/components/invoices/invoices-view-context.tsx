@@ -12,6 +12,9 @@ const PAGE_SIZE_STORAGE_KEY = "invoices:pageSize";
 
 type Filters = Omit<InvoiceQueryInput, "pageSize">;
 
+// pageSize is deliberately excluded from Filters/the URL — it's a per-device
+// preference stored in localStorage (see useLocalStorage below), not a
+// shareable filter.
 const DEFAULT_FILTERS: Filters = (() => {
   const { pageSize, ...rest } = InvoiceQuerySchema.parse({});
   void pageSize;
@@ -103,6 +106,8 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
 
   const setFilter = useCallback(
     (updates: Partial<Omit<Filters, "pageNum">>) => {
+      // Always reset to page 1: the new filter can change the result count,
+      // so staying on the current page could land out of range.
       navigate({ ...filters, ...updates, pageNum: 1 });
     },
     [filters, navigate],
@@ -153,6 +158,9 @@ export function InvoicesViewProvider({ children }: { children: ReactNode }) {
     setPage,
     setPageSize,
     clearFilters,
+    // Promise intentionally discarded: consumers treat refresh as
+    // fire-and-forget, and awaiting in a click handler would just add
+    // unhandled-rejection/lint noise for no benefit here.
     refetch: () => void refetch(),
   };
 

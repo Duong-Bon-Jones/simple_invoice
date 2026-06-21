@@ -16,6 +16,7 @@ const PAGE_SIZE_OPTIONS = ["10", "20", "50", "100"];
 export function InvoicePagination() {
   const { paging, isFetching, setPage, setPageSize } = useInvoicesView();
   const { pageNum, pageSize, total } = paging;
+  // Floor of 1 avoids "Page 1 of 0" when the result set is empty.
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
